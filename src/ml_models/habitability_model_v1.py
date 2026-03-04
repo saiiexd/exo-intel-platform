@@ -82,3 +82,22 @@ import joblib
 joblib.dump(model, "models/habitability_model_v1.pkl")
 
 print("Model saved")
+
+# FEATURE IMPORTANCE
+
+import pandas as pd
+
+feature_importance = pd.DataFrame({
+    "feature": X.columns,
+    "importance": model.feature_importances_
+})
+
+feature_importance = feature_importance.sort_values(
+    by="importance",
+    ascending=False
+)
+
+print("\nFeature Importance Ranking")
+print(feature_importance)
+
+feature_importance.to_csv("models/feature_importance_v1.csv", index=False)
