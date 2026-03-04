@@ -1,17 +1,12 @@
-import psycopg2
 import pandas as pd
+from utils.db import get_psycopg2_conn
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 
 
 # DATABASE CONNECTION
-conn = psycopg2.connect(
-    host="localhost",
-    database="exo_intel_db",
-    user="postgres",
-    password="saivenkat143"
-)
+conn = get_psycopg2_conn()
 
 query = """
 SELECT

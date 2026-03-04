@@ -1,5 +1,5 @@
 import requests
-import psycopg2
+from utils.db import get_psycopg2_conn
 
 # NASA dataset API
 url = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name,hostname,discoverymethod,disc_year,pl_orbper,pl_rade,pl_bmasse,pl_eqt,st_teff,st_mass,st_rad+from+pscomppars&format=json"
@@ -13,12 +13,7 @@ print("Records received:", len(data))
 
 
 # PostgreSQL connection
-conn = psycopg2.connect(
-    host="localhost",
-    database="exo_intel_db",
-    user="postgres",
-    password="saivenkat143"
-)
+conn = get_psycopg2_conn()
 
 cursor = conn.cursor()
 

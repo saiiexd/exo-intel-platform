@@ -1,13 +1,8 @@
-import psycopg2
 import pandas as pd
+from utils.db import get_psycopg2_conn
 
 # Database connection
-conn = psycopg2.connect(
-    host="localhost",
-    database="exo_intel_db",
-    user="postgres",
-    password="saivenkat143"
-)
+conn = get_psycopg2_conn()
 
 query = """
 SELECT 
