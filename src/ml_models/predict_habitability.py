@@ -1,28 +1,48 @@
-import joblib
 import pandas as pd
+import joblib
+from sqlalchemy import create_engine
 
-# load trained model
-model = joblib.load("models/habitability_model_v1.pkl")
+engine = create_engine(
+    "postgresql://postgres:saivenkat143@localhost/exo_intel_db"
+)
 
-print("Model loaded")
+model = joblib.load("src/ml_models/habitability_model.pkl")
 
-# example planet input
-data = {
-    "planet_radius": [1.2],
-    "planet_mass": [1.5],
-    "planet_density": [0.87],
-    "equilibrium_temperature": [290],
-    "stellar_temperature": [5700],
-    "stellar_mass": [1.0],
-    "stellar_radius": [1.0],
-    "earth_similarity_score": [0.82]
-}
+query = """
+SELECT
+planet_id,
+planet_radius,
+planet_mass,
+planet_density,
+equilibrium_temperature,
+stellar_temperature,
+stellar_mass,
+stellar_radius
+FROM exoplanet_data.planets
+"""
 
-planet = pd.DataFrame(data)
+df = pd.read_sql(query, engine)
 
-prediction = model.predict(planet)
+features = [
+"planet_radius",
+"planet_mass",
+"planet_density",
+"equilibrium_temperature",
+"stellar_temperature",
+"stellar_mass",
+"stellar_radius"
+]
 
-if prediction[0] == 1:
-    print("Prediction: Potentially Habitable Planet")
-else:
-    print("Prediction: Not Habitable")
+X = df[features]
+
+df["ml_predicted_habitability"] = model.predict(X)
+
+df[["planet_id","ml_predicted_habitability"]].to_sql(
+"ml_habitability_predictions",
+engine,
+schema="exoplanet_data",
+if_exists="replace",
+index=False
+)
+
+print("Predictions stored in database")
