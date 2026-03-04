@@ -1,177 +1,122 @@
-# ExoIntel
-
-AI-Powered Exoplanet Discovery & Habitability Analytics Platform
+# ExoIntel – AI Platform for Exoplanet Habitability Analysis
 
 ## Overview
 
-ExoIntel is a data analytics and artificial intelligence platform designed to analyze exoplanet datasets and identify potentially habitable planets using machine learning and data engineering pipelines.
+ExoIntel is a data science platform designed to analyze exoplanet datasets and estimate planetary habitability using machine learning.
 
-The platform integrates astronomical datasets, data warehousing, habitability scoring algorithms, and an AI-powered SQL assistant to enable researchers and analysts to explore planetary systems efficiently.
+The system integrates data engineering, analytics, and machine learning to explore potential Earth-like planets discovered in astronomical surveys.
 
-This project demonstrates a full data platform architecture combining data engineering, data science, and AI-assisted analytics.
-
----
-
-## Core Features
-
-### Exoplanet Data Warehouse
-
-A PostgreSQL-based analytical database storing exoplanetary system data including:
-
-* planetary radius
-* planetary mass
-* stellar temperature
-* equilibrium temperature
-* discovery methods
-* orbital characteristics
-
-### Habitability Scoring Model
-
-A custom habitability scoring algorithm designed to evaluate how similar a planet is to Earth using parameters such as:
-
-* Earth Similarity Score
-* Planetary Density
-* Equilibrium Temperature
-* Stellar Temperature
-
-The model generates a **Habitability Index** that ranks planets based on potential habitability.
-
-### AI SQL Assistant
-
-An AI-powered natural language interface that converts user questions into SQL queries using a local language model.
-
-Technology used:
-
-* Ollama
-* Mistral LLM
-
-Example questions:
-
-* "Show the top 10 most habitable planets"
-* "List planets discovered after 2015"
-* "Which discovery method found the most planets?"
-
-### Data Engineering Pipeline
-
-Automated ingestion pipeline that:
-
-1. downloads exoplanet datasets
-2. transforms raw data
-3. loads structured data into PostgreSQL
-4. computes analytical features
-
-### Analytical Views
-
-Pre-built SQL analytical views enable fast exploration of planetary data:
-
-* habitability rankings
-* discovery trends
-* habitability distribution
-
-### Data Visualization
-
-Power BI dashboards can be connected directly to the PostgreSQL warehouse for interactive exploration of exoplanetary datasets.
+This project demonstrates how modern data platforms can combine databases, machine learning models, and interactive dashboards to analyze astrophysical datasets.
 
 ---
 
-## System Architecture
+## Key Features
 
-User Query
-↓
-AI SQL Assistant (Mistral via Ollama)
-↓
-SQL Generation
-↓
-PostgreSQL Data Warehouse
-↓
-Query Results / Analytics
+**Data Warehouse**
+
+A PostgreSQL database stores exoplanet data and derived analytics tables.
+
+**SQL Analytics Layer**
+
+Custom SQL views compute aggregated statistics and habitability ranking metrics.
+
+**Machine Learning Model**
+
+A Random Forest regression model predicts a habitability score based on planetary and stellar parameters.
+
+**Power BI Dashboard**
+
+An interactive analytics dashboard provides insights into planet distributions, stellar systems, and predicted habitability.
+
+**Interactive Web Application**
+
+A Streamlit application allows users to explore planets and simulate habitability predictions using adjustable astrophysical parameters.
 
 ---
 
-## Tech Stack
+## Technology Stack
 
-Programming Language
 Python
-
-Database
 PostgreSQL
-
-Machine Learning
+SQLAlchemy
 Scikit-learn
-
-AI Model
-Mistral (via Ollama)
-
-Data Processing
-Pandas
-NumPy
-
-Visualization
+Streamlit
+Plotly
 Power BI
 
-Version Control
-Git
-GitHub
+---
+
+## Project Architecture
+
+Data Flow
+
+Database (PostgreSQL)
+↓
+SQL Views & Data Preparation
+↓
+Machine Learning Model
+↓
+Interactive Analytics (Power BI + Streamlit)
 
 ---
 
-## Project Structure
+## Machine Learning Model
 
-```
-exo-intel-platform
-│
-├── data
-│   ├── raw
-│   └── processed
-│
-├── migrations
-│
-├── src
-│   ├── ingestion
-│   ├── ml_models
-│   ├── ai_assistant
-│
-├── notebooks
-│
-├── requirements.txt
-└── README.md
-```
+The habitability model analyzes the following planetary and stellar parameters:
+
+* Planet Radius
+* Planet Mass
+* Planet Density
+* Equilibrium Temperature
+* Stellar Temperature
+* Stellar Mass
+* Stellar Radius
+
+The model predicts a habitability score representing the likelihood that a planet could support Earth-like conditions.
 
 ---
 
-## Installation
+## Running the Project
 
-Clone the repository
-
-```
-git clone https://github.com/saiiexd/exo-intel-platform.git
-```
-
-Install dependencies
+### 1 Install Dependencies
 
 ```
 pip install -r requirements.txt
 ```
 
-Run database migrations and load the dataset.
+### 2 Train the Model
+
+```
+python src/ml_models/train_habitability_model.py
+```
+
+### 3 Launch the Web Application
+
+```
+streamlit run src/frontend/app.py
+```
+
+---
+
+## Example Use Cases
+
+Exploring Earth-like planets in exoplanet datasets
+Understanding relationships between stellar and planetary properties
+Simulating hypothetical planetary systems
+Demonstrating end-to-end data science pipelines
 
 ---
 
 ## Future Improvements
 
-* Advanced machine learning models for habitability prediction
-* Interactive analytics interface
-* automatic astronomical dataset updates
-* AI-powered research assistant for astrophysics queries
+Improved feature engineering for habitability modeling
+Automated discovery of potentially habitable planets
+Advanced model interpretability techniques
+Expanded astrophysical datasets
 
 ---
 
 ## Author
 
 Sai Venkat
-Engineering Student – Data Science & AI
-
-Project Focus
-AI systems
-Data Engineering
-Machine Learning
+Engineering Student – Data Science & Machine Learning
