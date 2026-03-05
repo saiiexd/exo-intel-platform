@@ -6,268 +6,202 @@ import joblib
 import numpy as np
 import os
 
-st.set_page_config(page_title="ExoIntel Planet Habitability Intelligence System", layout="wide")
+st.set_page_config(page_title="ExoIntel AI Discovery Explorer", layout="wide")
 
-st.title("ExoIntel – AI System for Exoplanet Habitability Analysis")
-
-st.markdown("""
-This platform analyzes exoplanet characteristics and estimates the **habitability potential** of planets using a machine learning model.
-
-The model evaluates astrophysical properties such as:
-
-• Planet radius  
-• Planet mass  
-• Planet density  
-• Planet temperature  
-• Host star temperature  
-• Host star mass  
-• Host star radius  
-
-The system was trained using known exoplanet datasets to identify patterns that correlate with Earth-like conditions.
-
-Habitability scores closer to **1** indicate higher similarity to Earth-like environments.
-""")
-
-engine = create_engine("postgresql://postgres:saivenkat143@localhost:5432/exo_intel_db")
-
-query = """
-SELECT
-planet_name,
-planet_radius,
-planet_mass,
-planet_density,
-equilibrium_temperature,
-stellar_temperature,
-stellar_mass,
-stellar_radius
-FROM exoplanet_data.planets
-"""
-
-df = pd.read_sql(query, engine)
-
-df = df.fillna(0)
-
-st.divider()
-
-st.header("Dataset Overview")
-
-col1,col2,col3,col4 = st.columns(4)
-
-col1.metric("Total Planets",len(df))
-col2.metric("Average Radius",round(df["planet_radius"].mean(),2))
-col3.metric("Average Mass",round(df["planet_mass"].mean(),2))
-col4.metric("Average Temperature",round(df["equilibrium_temperature"].mean(),2))
+st.title("ExoIntel – AI Discovery Explorer")
 
 st.markdown("""
-The dataset contains thousands of confirmed exoplanets discovered by different astronomical techniques.
-These planets orbit stars across our galaxy and vary widely in their physical properties.
-
-Understanding these parameters helps scientists estimate which planets could potentially support life.
+Welcome to the **ExoIntel AI Discovery Explorer**. This scientific platform analyzes exoplanets 
+and automatically identifies the most promising candidates for habitability by combining robust 
+machine learning predictions with analytical physical similarity metrics. 
 """)
 
 st.divider()
 
-st.header("Planet Distribution Analysis")
+# Only load the necessary columns from the discovery table for optimized loading
+@st.cache_data
+def load_discovery_data():
+    engine = create_engine("postgresql://postgres:saivenkat143@localhost:5432/exo_intel_db")
+    query = """
+    SELECT
+        planet_name,
+        planet_radius,
+        planet_mass,
+        planet_density,
+        equilibrium_temperature,
+        stellar_temperature,
+        stellar_mass,
+        stellar_radius,
+        earth_similarity_approx as earth_similarity_score,
+        stellar_habitability_factor,
+        ml_habitability_score,
+        combined_discovery_score as discovery_score,
+        discovery_rank
+    FROM exoplanet_data.habitable_planet_candidates
+    ORDER BY discovery_rank ASC
+    """
+    return pd.read_sql(query, engine)
 
-colA,colB = st.columns(2)
+try:
+    df_candidates = load_discovery_data()
+except Exception as e:
+    st.error(f"Error connecting to database: {e}")
+    st.stop()
 
-fig1 = px.histogram(
-df,
-x="planet_radius",
-nbins=40,
-title="Distribution of Planet Radius"
-)
+# --- Section 1: AI Discovery Leaderboard ---
+st.header("1. AI Discovery Leaderboard")
+st.markdown("Top 20 candidates ranked by the composite Discovery Score.")
 
-colA.plotly_chart(fig1,width="stretch")
+top_20 = df_candidates.head(20).copy()
 
-fig2 = px.histogram(
-df,
-x="planet_mass",
-nbins=40,
-title="Distribution of Planet Mass"
-)
+# Format for display
+display_top_20 = top_20[["discovery_rank", "planet_name", "discovery_score", "ml_habitability_score", "earth_similarity_score"]].copy()
+display_top_20.columns = ["Rank", "Planet Name", "Discovery Score", "ML Score", "Earth Similarity Score"]
 
-colB.plotly_chart(fig2,width="stretch")
-
-colC,colD = st.columns(2)
-
-fig3 = px.scatter(
-df,
-x="equilibrium_temperature",
-y="planet_radius",
-size="planet_mass",
-hover_name="planet_name",
-title="Planet Temperature vs Radius"
-)
-
-colC.plotly_chart(fig3,width="stretch")
-
-fig4 = px.scatter(
-df,
-x="stellar_temperature",
-y="planet_mass",
-size="planet_radius",
-hover_name="planet_name",
-title="Star Temperature vs Planet Mass"
-)
-
-colD.plotly_chart(fig4,width="stretch")
-
-st.markdown("""
-These plots show the diversity of planetary systems discovered so far.
-
-Large planets tend to dominate discovery datasets because they are easier to detect using transit and radial velocity methods.
-
-Smaller Earth-sized planets are harder to detect but are the most interesting from a habitability perspective.
-""")
+st.dataframe(display_top_20, hide_index=True, use_container_width=True)
 
 st.divider()
 
-st.header("Planet Explorer")
+# --- Section 2: Habitability Explorer ---
+st.header("2. Habitability Explorer")
+st.markdown("Interactively filter the planetary candidates using dynamic thresholds.")
 
-planet = st.selectbox("Select a planet to inspect its parameters",df["planet_name"])
+col1, col2 = st.columns(2)
+min_ml = col1.slider("Minimum ML Habitability Score", 0.0, 1.0, 0.5, 0.01)
+min_ess = col2.slider("Minimum Earth Similarity Score", 0.0, 1.0, 0.5, 0.01)
 
-selected = df[df["planet_name"]==planet]
+filtered_df = df_candidates[
+    (df_candidates["ml_habitability_score"] >= min_ml) &
+    (df_candidates["earth_similarity_score"] >= min_ess)
+]
 
-st.dataframe(selected,width="stretch")
-
-st.markdown("""
-This explorer allows inspection of the physical parameters for each known exoplanet in the dataset.
-""")
+st.metric("Total Candidates Matching Criteria", len(filtered_df))
+st.dataframe(filtered_df, hide_index=True, use_container_width=True)
 
 st.divider()
 
-st.header("Habitability Prediction Simulator")
+# --- Section 3: Physical Similarity vs ML Predictions ---
+st.header("3. Physical Similarity vs ML Predictions")
+st.markdown("This scatter plot visualizes the consensus between the analytical Earth Similarity Score and the Machine Learning Habitability Score.")
 
+if not filtered_df.empty:
+    fig_scatter = px.scatter(
+        filtered_df,
+        x="earth_similarity_score",
+        y="ml_habitability_score",
+        size="discovery_score",
+        hover_name="planet_name",
+        color="stellar_habitability_factor",
+        color_continuous_scale="viridis",
+        size_max=40,
+        title="ML Habitability vs Earth Similarity (Bubble Size = Discovery Score)",
+        labels={
+            "earth_similarity_score": "Earth Similarity Score",
+            "ml_habitability_score": "ML Habitability Score",
+            "stellar_habitability_factor": "Stellar Habitability Factor"
+        }
+    )
+    st.plotly_chart(fig_scatter, use_container_width=True)
+else:
+    st.warning("No planets match the active filters to display the scatter plot.")
+
+st.divider()
+
+# --- Section 4: Planet Detail Viewer ---
+st.header("4. Planet Detail Viewer")
+st.markdown("Select a planet to deeply inspect its astrophysical parameters and associated scores.")
+
+selected_planet = st.selectbox("Select Planet:", df_candidates["planet_name"].sort_values())
+planet_details = df_candidates[df_candidates["planet_name"] == selected_planet].iloc[0]
+
+colA, colB, colC, colD = st.columns(4)
+colA.metric("Discovery Rank", f"#{int(planet_details['discovery_rank'])}")
+colB.metric("Discovery Score", round(planet_details["discovery_score"], 3))
+colC.metric("ML Habitability Score", round(planet_details["ml_habitability_score"], 3))
+colD.metric("Earth Similarity Score", round(planet_details["earth_similarity_score"], 3))
+
+st.subheader("Physical Parameters")
+colE, colF, colG, colH = st.columns(4)
+colE.metric("Planet Radius (Earth=1)", round(planet_details["planet_radius"], 2))
+colF.metric("Planet Mass (Earth=1)", round(planet_details["planet_mass"], 2))
+colG.metric("Planet Density", round(planet_details["planet_density"], 2))
+colH.metric("Equilibrium Temp (K)", round(planet_details["equilibrium_temperature"], 2))
+
+st.subheader("Stellar Parameters")
+colI, colJ, colK, colL = st.columns(4)
+colI.metric("Stellar Temperature (K)", round(planet_details["stellar_temperature"], 2))
+colJ.metric("Stellar Mass (Sun=1)", round(planet_details["stellar_mass"], 2))
+colK.metric("Stellar Radius (Sun=1)", round(planet_details["stellar_radius"], 2))
+colL.metric("Stellar Habitability Factor", round(planet_details["stellar_habitability_factor"], 3))
+
+st.divider()
+
+# --- Section 5: Habitability Prediction Simulator (Legacy) ---
+st.header("5. Hypothetical Planet Simulator")
 st.markdown("""
-Use the sliders below to simulate a hypothetical planet and evaluate its potential habitability.
-
-Adjust planetary and stellar parameters, then click **Predict Habitability** to evaluate the planet.
+Use the sliders below to simulate a completely hypothetical planet and evaluate its potential habitability 
+using our trained machine learning model.
 """)
 
-col1,col2 = st.columns(2)
+col1_sim, col2_sim = st.columns(2)
 
-planet_radius = col1.slider("Planet Radius (Earth Radii)",0.1,20.0,1.0)
-planet_mass = col2.slider("Planet Mass (Earth Mass)",0.1,50.0,1.0)
+planet_radius_sim = col1_sim.slider("Planet Radius (Earth Radii)", 0.1, 20.0, 1.0)
+planet_mass_sim = col2_sim.slider("Planet Mass (Earth Mass)", 0.1, 50.0, 1.0)
 
-planet_density = col1.slider("Planet Density",0.1,20.0,5.5)
-equilibrium_temperature = col2.slider("Equilibrium Temperature (Kelvin)",50,2000,288)
+planet_density_sim = col1_sim.slider("Planet Density", 0.1, 20.0, 5.5)
+equilibrium_temperature_sim = col2_sim.slider("Equilibrium Temperature (Kelvin)", 50.0, 2000.0, 288.0)
 
-stellar_temperature = col1.slider("Host Star Temperature (Kelvin)",2000,10000,5500)
-stellar_mass = col2.slider("Host Star Mass (Solar Mass)",0.1,5.0,1.0)
+stellar_temperature_sim = col1_sim.slider("Host Star Temperature (Kelvin)", 2000.0, 10000.0, 5500.0)
+stellar_mass_sim = col2_sim.slider("Host Star Mass (Solar Mass)", 0.1, 5.0, 1.0)
 
-stellar_radius = st.slider("Host Star Radius (Solar Radius)",0.1,10.0,1.0)
+stellar_radius_sim = st.slider("Host Star Radius (Solar Radius)", 0.1, 10.0, 1.0)
 
-predict_button = st.button("Predict Habitability")
+predict_button = st.button("Predict Habitability for Hypothetical Planet")
 
+# Handle model loading centrally
 model_path = "src/ml_models/habitability_model.pkl"
+model = None
+features_list = [
+    "planet_radius", "planet_mass", "planet_density",
+    "equilibrium_temperature", "stellar_temperature",
+    "stellar_mass", "stellar_radius"
+]
+
+if os.path.exists(model_path):
+    artifact = joblib.load(model_path)
+    model = artifact.get("pipeline", artifact) # Handle both dict and raw pipeline
+    features_list = artifact.get("features", features_list)
 
 if predict_button:
+    if model is not None:
+        input_data = {
+            "planet_radius": planet_radius_sim,
+            "planet_mass": planet_mass_sim,
+            "planet_density": planet_density_sim,
+            "equilibrium_temperature": equilibrium_temperature_sim,
+            "stellar_temperature": stellar_temperature_sim,
+            "stellar_mass": stellar_mass_sim,
+            "stellar_radius": stellar_radius_sim
+        }
+        input_df = pd.DataFrame([input_data])[features_list]
 
-    if os.path.exists(model_path):
+        raw_prediction = model.predict(input_df)[0]
+        prediction = float(raw_prediction)
+        
+        with st.expander("🔍 Predictor Debug Info"):
+            st.write("Constructed Input DataFrame:")
+            st.dataframe(input_df)
+            st.write(f"Raw Model Prediction: {raw_prediction}")
+            st.write(f"Clamped Prediction: {max(0.0, min(1.0, prediction))}")
 
-        model = joblib.load(model_path)
-
-        features = np.array([[planet_radius,
-                              planet_mass,
-                              planet_density,
-                              equilibrium_temperature,
-                              stellar_temperature,
-                              stellar_mass,
-                              stellar_radius]])
-
-        prediction = model.predict(features)[0]
+        prediction = max(0.0, min(1.0, prediction))
 
         st.subheader("Prediction Result")
-
-        st.metric("Predicted Habitability Score",round(prediction,3))
+        st.metric("Predicted Habitability Score", round(prediction, 3))
 
         if prediction > 0.8:
-
             st.success("This simulated planet shows strong potential for habitability based on model predictions.")
-
         elif prediction > 0.5:
-
             st.warning("This planet may have moderate habitability potential.")
-
         else:
-
             st.error("This planet is unlikely to support Earth-like conditions.")
-
-        st.markdown("""
-Interpretation of Habitability Score:
-
-• **0.8 – 1.0** : Highly Earth-like conditions  
-• **0.5 – 0.8** : Potentially habitable environment  
-• **0.2 – 0.5** : Unlikely but possible under special conditions  
-• **0.0 – 0.2** : Extremely low habitability likelihood
-""")
-
-st.divider()
-
-st.header("Machine Learning Model Explanation")
-
-st.markdown("""
-The prediction model is a **Random Forest Regression model**.
-
-Random Forest works by building many decision trees that analyze different combinations of planetary and stellar properties.
-
-Each tree predicts a habitability score, and the final output is the average prediction from all trees.
-
-This approach helps capture complex nonlinear relationships between astrophysical variables.
-""")
-
-model = joblib.load(model_path)
-
-if hasattr(model,"feature_importances_"):
-
-    importance = model.feature_importances_
-
-    features = [
-    "planet_radius",
-    "planet_mass",
-    "planet_density",
-    "equilibrium_temperature",
-    "stellar_temperature",
-    "stellar_mass",
-    "stellar_radius"
-    ]
-
-    imp_df = pd.DataFrame({
-    "feature":features,
-    "importance":importance
-    })
-
-    fig5 = px.bar(
-    imp_df,
-    x="feature",
-    y="importance",
-    title="Feature Importance in Habitability Prediction"
-    )
-
-    st.plotly_chart(fig5,width="stretch")
-
-st.markdown("""
-Feature importance shows which astrophysical parameters influence habitability predictions the most.
-
-Planet radius and temperature typically play a strong role because they determine whether a planet could maintain liquid water and a stable atmosphere.
-""")
-
-st.divider()
-
-st.header("Scientific Context")
-
-st.markdown("""
-Habitability prediction is one of the central challenges of modern astrophysics.
-
-Astronomers search for planets within the **habitable zone**, a region around a star where temperatures could allow liquid water to exist.
-
-However, true habitability depends on many additional factors:
-
-• Atmospheric composition  
-• Magnetic field protection  
-• Geological activity  
-• Stellar radiation environment  
-
-Machine learning models like this one help researchers analyze large datasets of planetary systems and identify promising candidates for further observation.
-""")
