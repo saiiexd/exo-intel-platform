@@ -1,0 +1,77 @@
+{
+    "metadata": {
+        "timestamp": "2026-03-06T17:52:48.026500",
+        "n_samples": 5660,
+        "features": [
+            "planet_radius",
+            "planet_mass",
+            "planet_density",
+            "equilibrium_temperature",
+            "stellar_temperature",
+            "stellar_mass",
+            "stellar_radius"
+        ]
+    },
+    "experiments": [
+        {
+            "algorithm": "LinearRegression",
+            "training_duration_sec": 0.003693103790283203,
+            "cv_metrics": {
+                "r2_mean": 0.17089714386217442,
+                "r2_std": 0.00911631594137355,
+                "mae_mean": 0.0324513329310495,
+                "rmse_mean": 0.06470923373787385
+            },
+            "holdout_metrics": {
+                "r2": 0.15698634651931842,
+                "mae": 0.03139801850952519,
+                "rmse": 0.055680243026629314
+            }
+        },
+        {
+            "algorithm": "RandomForest",
+            "training_duration_sec": 1.2678442001342773,
+            "cv_metrics": {
+                "r2_mean": 0.9832116828901126,
+                "r2_std": 0.01101365925372693,
+                "mae_mean": 0.0013372861303789733,
+                "rmse_mean": 0.008620631576951084
+            },
+            "holdout_metrics": {
+                "r2": 0.9935787096822613,
+                "mae": 0.0008683992453539163,
+                "rmse": 0.004859537867615606
+            }
+        },
+        {
+            "algorithm": "GradientBoosting",
+            "training_duration_sec": 0.6158702373504639,
+            "cv_metrics": {
+                "r2_mean": 0.9869951936014605,
+                "r2_std": 0.007039631254099507,
+                "mae_mean": 0.0017894551686603213,
+                "rmse_mean": 0.0078850488235505
+            },
+            "holdout_metrics": {
+                "r2": 0.9921253121002216,
+                "mae": 0.0014945586854007915,
+                "rmse": 0.0053814646651207075
+            }
+        },
+        {
+            "algorithm": "HistGradientBoosting",
+            "training_duration_sec": 0.17231965065002441,
+            "cv_metrics": {
+                "r2_mean": 0.9790885676097038,
+                "r2_std": 0.007993190968062516,
+                "mae_mean": 0.002027995404572943,
+                "rmse_mean": 0.010118982840351336
+            },
+            "holdout_metrics": {
+                "r2": 0.9910214031106791,
+                "mae": 0.001481027276338045,
+                "rmse": 0.005746296811130919
+            }
+        }
+    ]
+}

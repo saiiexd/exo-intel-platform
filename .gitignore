@@ -6,18 +6,18 @@ __pycache__/
 
 # Environments
 .env
-.venv
 venv/
+.venv/
 ENV/
-env.bak
-env.rm
 
-# Data and Models
-*.csv
-*.json
-*.pkl
-*.db
-*.sqlite
+# Logs
+*.log
+pipeline_logs/
+
+# Data and Models (Keep directory structure but ignore specific artifacts)
+# results/
+# reports/
+analysis_outputs/temp/
 
 # IDEs
 .vscode/
@@ -25,18 +25,5 @@ env.rm
 *.swp
 *.swo
 
-# Project specific
-analysis_outputs/*.png
-analysis_outputs/*.txt
-pipeline_logs/*.log
-pipeline_logs/*.txt
-
 # Jupyter Notebooks
 .ipynb_checkpoints/
-
-.env
-venv/
-__pycache__/
-*.pyc
-pipeline_logs/
-analysis_outputs/temp/

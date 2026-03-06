@@ -1,0 +1,36 @@
+{
+    "report_metadata": {
+        "timestamp": "2026-03-06T17:53:05.070800",
+        "platform_version": "v1.3.0-research"
+    },
+    "discovery_summary": {
+        "total_candidates_analyzed": 50,
+        "top_candidate": "Gliese 12 b"
+    },
+    "scientific_drivers": [
+        {
+            "feature_name": "planet_mass",
+            "mean_abs_shap": 0.08097942356414806
+        },
+        {
+            "feature_name": "equilibrium_temperature",
+            "mean_abs_shap": 0.005812835818121544
+        },
+        {
+            "feature_name": "planet_radius",
+            "mean_abs_shap": 0.0029167844155527016
+        },
+        {
+            "feature_name": "stellar_radius",
+            "mean_abs_shap": 0.0005373003875205996
+        },
+        {
+            "feature_name": "planet_density",
+            "mean_abs_shap": 0.0005173802016597239
+        }
+    ],
+    "population_stats": {
+        "avg_score": 0.08283896163088966,
+        "count": 1563
+    }
+}

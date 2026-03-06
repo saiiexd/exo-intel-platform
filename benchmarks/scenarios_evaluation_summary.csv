@@ -1,0 +1,6 @@
+,planet_radius,planet_mass,planet_density,equilibrium_temperature,stellar_temperature,stellar_mass,stellar_radius,predicted_habitability_index,validation_status
+Earth_Baseline,1.0,1.0,5.51,288.0,5778.0,1.0,1.0,0.8200151157501948,PASSED
+Hot_Jupiter_Extreme,11.2,317.8,1.33,1500.0,6000.0,1.2,1.5,0.003338006646204152,PASSED
+Cold_Mars_Analogue,0.53,0.107,3.93,210.0,5778.0,1.0,1.0,0.6642416619871624,PASSED
+Super_Earth_Candidate,1.5,5.0,6.5,300.0,4500.0,0.5,0.5,0.21507829453957863,PASSED
+Water_World_Candidate,2.2,8.5,3.2,350.0,5200.0,0.8,0.8,0.12772514273080995,PASSED

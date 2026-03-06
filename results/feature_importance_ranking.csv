@@ -1,0 +1,8 @@
+feature_name,mean_abs_shap
+planet_mass,0.08097942356414806
+equilibrium_temperature,0.005812835818121544
+planet_radius,0.0029167844155527016
+stellar_radius,0.0005373003875205996
+planet_density,0.0005173802016597239
+stellar_mass,0.000390264352974514
+stellar_temperature,0.0003240052483359667
