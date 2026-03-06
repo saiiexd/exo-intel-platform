@@ -1,3 +1,13 @@
+"""
+run_exointel_pipeline.py
+========================
+End-to-End Pipeline Orchestrator for the ExoIntel Platform.
+
+Sequentially executes system components including data analysis, model 
+training, discovery ranking, and scientific visualization. Provides 
+automated execution reporting and validation.
+"""
+
 import os
 import sys
 import subprocess
@@ -51,12 +61,12 @@ def main():
     report_file_path = os.path.join(config.LOGS_DIR, f"execution_report_{timestamp_str}.txt")
     
     print("="*60)
-    print(f"🚀 Starting ExoIntel Pipeline Orchestrator at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Starting ExoIntel Pipeline Orchestrator at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("="*60)
     
     # Run Health Check First
     if not run_health_check():
-        print("\n❌ Pipeline aborted: System health check failed.")
+        print("\nPipeline aborted: System health check failed.")
         sys.exit(1)
         
     execution_details = []
@@ -77,8 +87,7 @@ def main():
             result = subprocess.run([sys.executable, "-m", module_path], check=True, capture_output=True, text=True)
             step_duration = time.time() - step_start_time
             
-            logger.info(f"✅ {step_name} completed in {step_duration:.2f}s")
-            print(f"✅ {step_name} completed successfully in {step_duration:.2f} seconds.")
+            print(f"Success: {step_name} completed in {step_duration:.2f} seconds.")
             
             execution_details.append({
                 "step": i,
@@ -90,8 +99,7 @@ def main():
             
         except subprocess.CalledProcessError as e:
             step_duration = time.time() - step_start_time
-            logger.error(f"❌ {step_name} FAILED: {e.stderr}")
-            print(f"❌ {step_name} FAILED after {step_duration:.2f} seconds.")
+            print(f"Failure: {step_name} FAILED after {step_duration:.2f} seconds.")
             print(f"Error Output:\n{e.stderr}")
             
             execution_details.append({
@@ -107,8 +115,7 @@ def main():
             break # Stop the pipeline if a step fails
         except Exception as e:
             step_duration = time.time() - step_start_time
-            logger.exception(f"❌ {step_name} encountered an unexpected error.")
-            print(f"❌ {step_name} FAILED due to unexpected error after {step_duration:.2f} seconds.")
+            print(f"Error: {step_name} FAILED due to unexpected error after {step_duration:.2f} seconds.")
             print(f"Exception: {str(e)}")
             
             execution_details.append({
@@ -127,7 +134,7 @@ def main():
     status_str = "SUCCESS" if pipeline_success else "FAILED"
     
     print("\n" + "="*60)
-    print(f"🛑 ExoIntel Pipeline Finished - Status: {status_str} - Total Time: {total_duration:.2f}s")
+    print(f"ExoIntel Pipeline Finished - Status: {status_str} - Total Time: {total_duration:.2f}s")
     print("="*60)
     
     # Write the report to a log file
@@ -150,7 +157,7 @@ def main():
             f.write("-" * 30 + "\n")
 
     logger.info(f"Pipeline finished with status: {status_str}")
-    print(f"\n📝 Detailed execution report saved to: {report_file_path}\n")
+    print(f"\nDetailed execution report saved to: {report_file_path}\n")
 
 if __name__ == "__main__":
     main()

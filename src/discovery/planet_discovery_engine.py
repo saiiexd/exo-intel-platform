@@ -1,21 +1,19 @@
 """
 planet_discovery_engine.py
 ==========================
-ExoIntel – Phase 3: Planet Discovery and Ranking Engine
+Target Prioritization and Planet Discovery Engine.
 
-This script automates the discovery of potentially habitable exoplanets by combining
-machine learning predictions with engineered astrophysical scores.
+Automates the identification of potentially habitable exoplanets by synthesizing 
+machine learning predictions with astrophysical analytical indices. This module 
+ranks planetary candidates using a weighted discovery score and maintains the 
+primary prioritized discovery catalog.
 
 Workflow:
-1. Loads the enriched dataset (from Phase 2).
-2. Runs the trained ML model inference across all planets.
-3. Computes a Combined Discovery Score (60% ML + 40% Earth Similarity).
-4. Ranks candidates and computes percentile standing.
-5. Saves the resulting discovery catalogue to PostgreSQL.
-6. Generates visual analytics (Top 20 rankings, scatter plots, heatmaps).
-
-Usage (from project root):
-    python -m src.discovery.planet_discovery_engine
+1. Retrieval of curated astronomical data.
+2. Gradient Boosting inference execution.
+3. Composite Discovery Score computation (ML precision joined with Earth Similarity).
+4. Statistical ranking and percentile standing analysis.
+5. Catalog persistence and visual prioritization reporting.
 """
 
 import os
@@ -37,11 +35,7 @@ logger = setup_logger("DiscoveryEngine")
 warnings.filterwarnings("ignore")
 
 # ML model expected features
-FEATURES = [
-    "planet_radius", "planet_mass", "planet_density",
-    "equilibrium_temperature", "stellar_temperature",
-    "stellar_mass", "stellar_radius"
-]
+FEATURES = config.FEATURE_LIST
 
 
 def load_enriched_data():

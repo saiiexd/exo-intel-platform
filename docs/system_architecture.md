@@ -30,6 +30,7 @@ graph TD
     subgraph Analysis_Layer ["Explainability & Insights"]
         SHAP["Explainable AI (SHAP) (explainability_engine.py)"]
         Insights["Scientific Insight Engine (insight_engine.py)"]
+        Summary["Discovery Summary Generator (discovery_summary_generator.py)"]
         Reports["analysis_outputs (Plots & Analytics)"]
     end
 
@@ -44,6 +45,7 @@ graph TD
     Orchestrator -- "3. Triggers ranking" --> Discovery
     Orchestrator -- "4. Triggers SHAP" --> SHAP
     Orchestrator -- "5. Triggers charts" --> Insights
+    Orchestrator -- "6. Triggers summary" --> Summary
 
     RawData --> Analysis
     Analysis --> DB
@@ -61,6 +63,9 @@ graph TD
     Insights --> Reports
     Insights -- "Aggregates" --> DB
 
+    DB -- "Final Statistics" --> Summary
+    Summary --> Reports
+
     DB --> Streamlit
     Reports --> Streamlit
     Orchestrator -- "Execution Reports" --> Logs["pipeline_logs/"]
@@ -77,4 +82,5 @@ graph TD
 | **Discovery Engine** | Performs batch inference on the entire catalog to rank and prioritize the most promising exoplanet candidates. |
 | **Explainable AI (SHAP)** | Breaks down model "black box" decisions into interpretable feature contributions using SHAP values. |
 | **Scientific Insight Engine** | Generates high-level astrophysical visualizations and correlation heatmaps for research analysis. |
-| **Streamlit Interface** | Providing an interactive, visual gateway for researchers to explore candidates and simulate habitability. |
+| **Summary Generator** | Produces the final executive research summary report based on all pipeline findings. |
+| **Streamlit Interface** | Provides an interactive, visual gateway for researchers to explore candidates and simulate habitability. |

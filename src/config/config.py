@@ -1,7 +1,13 @@
+"""
+config.py
+=========
+Centralized configuration management for the ExoIntel platform.
+Loads system settings and credentials from environment variables.
+"""
+
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
 class Config:
@@ -26,5 +32,12 @@ class Config:
     # Ensure directories exist
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     os.makedirs(LOGS_DIR, exist_ok=True)
+
+    # Feature Engineering Configuration
+    FEATURE_LIST = [
+        "planet_radius", "planet_mass", "planet_density",
+        "equilibrium_temperature", "stellar_temperature",
+        "stellar_mass", "stellar_radius"
+    ]
 
 config = Config()

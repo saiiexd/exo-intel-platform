@@ -1,3 +1,13 @@
+"""
+github_sync.py
+==============
+Automated Repository Synchronization Utility.
+
+Manages the Git lifecycle for the ExoIntel platform, providing automated 
+staging, commitment, and synchronization with remote repositories. 
+Includes support for semantic version tagging.
+"""
+
 import subprocess
 import sys
 import argparse
@@ -5,12 +15,12 @@ from datetime import datetime
 
 def run_command(command, description):
     """Executes a shell command and prints progress."""
-    print(f"🚀 {description}...")
+    print(f"Executing: {description}...")
     try:
         result = subprocess.run(command, check=True, capture_output=True, text=True)
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
-        print(f"❌ Error during '{description}':")
+        print(f"Error during '{description}':")
         print(e.stderr)
         return None
 
@@ -26,7 +36,7 @@ def main():
         return
 
     if not status and not args.tag:
-        print("✅ Repository is already synchronized. Nothing to commit.")
+        print("Repository is already synchronized. Nothing to commit.")
         return
 
     # 2. Stage changes
@@ -43,11 +53,11 @@ def main():
 
     # 5. Handle Tagging
     if args.tag:
-        print(f"🔖 Tagging version: {args.tag}")
+        print(f"Tagging version: {args.tag}")
         run_command(["git", "tag", args.tag], f"Creating tag {args.tag}")
         run_command(["git", "push", "origin", args.tag], f"Pushing tag {args.tag} to GitHub")
 
-    print("\n✨ Synchronization complete!")
+    print("\nSynchronization complete!")
 
 if __name__ == "__main__":
     main()

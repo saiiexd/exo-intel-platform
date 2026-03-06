@@ -1,3 +1,14 @@
+"""
+explainability_engine.py
+========================
+Explainable AI (XAI) Model Interpretation Module.
+
+Leverages SHAP (Shapley Additive Explanations) to provide transparency for the 
+habitability prediction model. This module generates global importance scores, 
+summary distributions, and specific planetary explanations (waterfall plots).
+
+Integrates SHAP analytics into the database for downstream visualization.
+"""
 import os
 import sys
 import warnings
@@ -30,11 +41,7 @@ def generate_explanations():
     logger.info("Loading the Trained ML Model ...")
     artifact = joblib.load(config.MODEL_PATH)
     pipeline = artifact.get("pipeline", artifact)
-    features_list = artifact.get("features", [
-        "planet_radius", "planet_mass", "planet_density",
-        "equilibrium_temperature", "stellar_temperature",
-        "stellar_mass", "stellar_radius"
-    ])
+    features_list = artifact.get("features", config.FEATURE_LIST)
         
     df = df.dropna(subset=features_list).copy().reset_index(drop=True)
     X = df[features_list]
@@ -89,9 +96,6 @@ def generate_explanations():
         logger.error(f"Failed writing to DB: {e}")
         
     logger.info("Explainability Engine integration complete.")
-
-if __name__ == "__main__":
-    generate_explanations()
 
 if __name__ == "__main__":
     generate_explanations()

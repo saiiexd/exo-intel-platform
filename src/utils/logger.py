@@ -1,3 +1,10 @@
+"""
+logger.py
+=========
+Standardized logging utility for the ExoIntel platform.
+Provides unified console and file-based logging configurations.
+"""
+
 import logging
 import os
 from datetime import datetime

@@ -1,13 +1,11 @@
 """
 insight_engine.py
 =================
-ExoIntel – Phase 6: Scientific Insight Engine
+Astrophysical Analytical Insight Engine.
 
-Automatically analyzes the enriched dataset and discovery results to surface
-scientific insights about planetary habitability trends across the galaxy.
-
-Usage:
-    python -m src.analytics.insight_engine
+Synthesizes high-level scientific trends and correlations from the processed 
+planetary datasets. This module evaluates discovery method efficacy and stellar-level 
+habitability patterns, generating publication-quality analytics for the dashboard.
 """
 import os
 import warnings

@@ -1,3 +1,10 @@
+"""
+db.py
+=====
+Database connectivity utilities for the ExoIntel platform.
+Manages SQLAlchemy engines and raw psycopg2 connections.
+"""
+
 from sqlalchemy import create_engine
 import psycopg2
 from src.config.config import config

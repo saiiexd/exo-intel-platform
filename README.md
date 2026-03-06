@@ -1,186 +1,138 @@
-# ExoIntel: AI Exoplanet Discovery Platform 🪐
+# ExoIntel AI Exoplanet Discovery Platform
 
-[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![Machine Learning](https://img.shields.io/badge/ML-Gradient_Boosting-F7931E?style=flat)](https://scikit-learn.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+ExoIntel is an advanced, production-grade AI platform designed for the automated discovery and scientific analysis of potentially habitable exoplanets. By integrating high-fidelity astronomical data engineering with Gradient Boosting machine learning models and SHAP-based explainability, ExoIntel provides a comprehensive research framework for identifying high-priority planetary candidates.
 
-**ExoIntel** is a high-performance, end-to-end data intelligence system designed to automate the discovery and analysis of habitable exoplanets. By fusing astronomical data engineering with advanced machine learning, explainable AI (XAI), and interactive dashboards, ExoIntel transforms raw stellar observations into prioritized scientific insights.
+## Key Capabilities
 
----
+*   **Machine Learning Prediction**: High-precision habitability indexing using Gradient Boosting regression models.
+*   **Discovery Ranking Subsystem**: Weighted prioritization engine combining ML scores with Earth Similarity analytical indices.
+*   **Explainable AI (XAI)**: Full model transparency via SHAP (Shapley Additive Explanations) for both global and local feature analysis.
+*   **Scientific Insight Analytics**: Automated generation of publication-quality statistical visualizations and astrophysical trend reports.
+*   **End-to-End Orchestration**: A robust, single-command pipeline for data cleansing, model training, and insight generation.
 
-## ⚡ Quick Demo
+## System Architecture
 
-Rebuild the entire universe and launch the explorer in two simple steps:
+ExoIntel follows a modular, pipeline-oriented architecture designed for scalability and scientific reproducibility.
 
-1. **Orchestrate the Pipeline**: Run the full automated cycle (Data Cleaning → ML Training → Discovery → XAI → Insights).
-   ```bash
-   python run_exointel_pipeline.py
-   ```
+1.  **Data Warehouse Layer**: Persistent storage of astronomical observations in a PostgreSQL database.
+2.  **Engineering Layer**: Automated data cleansing, outlier detection, and astrophysical feature derivation.
+3.  **Modeling Layer**: Supervised learning pipeline for habitability prediction and model persistence.
+4.  **Inference & Ranking Layer**: Batch processing of planetary catalogs to generate a prioritized discovery standing.
+5.  **Analytics Layer**: Statistical Insight Engine and XAI Interpreter for scientific validation.
+6.  **Presentation Layer**: High-performance interactive dashboard for research exploration.
 
-2. **Explore Research Insights**: Launch the interactive AI Research Dashboard.
-   ```bash
-   streamlit run src/frontend/app.py
-   ```
+## Pipeline Workflow
 
----
+The ExoIntel platform orchestrates data flow through the following integrated sequence:
 
-## ✨ Project Highlights
+1.  **Dataset Analysis**: `src/data_analysis/dataset_analysis.py` - Performs outlier removal (Z-score/IQR) and engineers Earth Similarity indices.
+2.  **Model Training**: `src/ml_models/train_habitability_model.py` - Optimizes the Gradient Boosting model for habitability indexing.
+3.  **Discovery Engine**: `src/discovery/planet_discovery_engine.py` - Executes batch inference and computes the Composite Discovery Score.
+4.  **Explainability Engine**: `src/ml_models/explainability_engine.py` - Calculates SHAP values to interpret model decisions globally and locally.
+5.  **Insight Engine**: `src/analytics/insight_engine.py` - Generates astrophysical correlations and trend visualizations.
+6.  **Summary Generation**: `src/analytics/discovery_summary_generator.py` - Produces the final executive research summary report.
 
-- **🎯 AI-Based Habitability Prediction**: Utilizes a Gradient Boosting Regressor to compute a high-precision Habitability Index for thousands of exoplanets based on planetary and stellar physics.
-- **🏆 Automated Discovery Ranking**: Intelligent ranking subsystem that prioritizes candidates by combining ML scores with Earth Similarity indices and stellar habitat factors.
-- **🔍 Explainable AI (SHAP)**: Transcends "black-box" ML by using SHAP values to visualize exactly how planetary mass, radius, and temperature influenced every single prediction.
-- **📊 Scientific Insight Analytics**: Automated generation of publication-ready visualizations, including habitability distributions, correlation heatmaps, and stellar trend analyses.
-- **🛰️ Interactive Research Interface**: A Streamlit-powered frontend for deep-diving into individual planets and simulating hypothetical planetary scenarios.
+## Technology Stack
 
----
+*   **Logic**: Python 3.9+
+*   **Database**: PostgreSQL with SQLAlchemy ORM
+*   **Machine Learning**: Scikit-Learn (Gradient Boosting), NumPy, Pandas
+*   **Explainability**: SHAP (Shapley Additive Explanations)
+*   **Visualization**: Plotly, Matplotlib, Seaborn
+*   **Frontend**: Streamlit
+*   **Deployment**: Docker, Docker Compose
 
-## ⚙️ System Workflow
+## Repository Structure
 
-The platform follows a modular, linear-flow architecture:
+*   `src/data_analysis/`: Modules for data cleaning, enrichment, and quality diagnostics.
+*   `src/ml_models/`: ML pipeline definitions, model artifacts, and explainability logic.
+*   `src/discovery/`: Discovery ranking algorithms and batch inference engines.
+*   `src/analytics/`: Scientific insight generators and executive reporting utilities.
+*   `src/frontend/`: Interactive Streamlit dashboard source.
+*   `src/config/`: Centralized platform configuration and environment management.
+*   `src/utils/`: Standardized logging, database connectivity, and health diagnostics.
+*   `analysis_outputs/`: Dynamically generated research plots and statistical reports.
+*   `pipeline_logs/`: System execution logs and detailed performance reports.
+*   `docs/`: Technical documentation and system architecture diagrams.
 
-1. **Ingestion & Data Warehouse**: Raw astronomical data is stored in **PostgreSQL**.
-2. **Feature Engineering**: `dataset_analysis.py` cleans data and derives physical similarity metrics.
-3. **ML Pipeline**: `train_habitability_model.py` trains and optimizes the habitability model.
-4. **Discovery Engine**: `planet_discovery_engine.py` performs batch predictions across the entire catalog.
-5. **Explainability Layer**: `explainability_engine.py` computes SHAP values for global and local transparency.
-6. **Insight Generation**: `insight_engine.py` produces complex statistical charts and research tables.
-7. **Interactive Dashboard**: `app.py` presents findings through an immersive UI.
+## Getting Started
 
----
+### 1. Prerequisites
 
-## 🛠️ Technology Stack
+*   Python 3.9 or higher
+*   PostgreSQL 15 or higher
+*   Docker (Optional, for containerized deployment)
 
-- **Languages**: Python (Core Logic)
-- **Database**: PostgreSQL (Data Warehouse), SQLAlchemy (ORM)
-- **Machine Learning**: Scikit-Learn (Gradient Boosting), NumPy, Pandas
-- **Explainability**: SHAP (Shapley Additive Explanations)
-- **Frontend/Viz**: Streamlit, Plotly, Matplotlib, Seaborn
-- **Automation**: Subprocess-based Orchestration
+### 2. Configuration
 
----
+Set up your environment variables by creating a `.env` file from the provided template:
 
-## 🖼️ Demo & Visualizations
-
-The ExoIntel pipeline automatically generates these insights to help researchers interpret planetary trends:
-
-### 1. Global Feature Importance (XAI)
-![SHAP Global Importance](analysis_outputs/08_shap_global_importance.png)
-*This chart identifies which astrophysical features (like Planetary Equilibrium Temp and Radius) drive the model's habitability predictions globally.*
-
-### 2. Habitability vs. Stellar Temperature
-![Habitability Trends](analysis_outputs/11_habitability_vs_stellar_temp.png)
-*A scientific scatter plot demonstrating the "Goldilocks" distribution of habitable candidates relative to their host star's temperature.*
-
-### 3. SHAP Summary Distribution
-![SHAP Summary](analysis_outputs/09_shap_summary_plot.png)
-*Visualizes how variations in specific features (e.g., higher stellar mass vs lower temperature) shift the final habitability score.*
-
-### 4. Insight Correlation Heatmap
-![Correlation Heatmap](analysis_outputs/14_insight_correlation_heatmap.png)
-*A statistical overview revealing hidden relationships between planetary constraints and system-wide habitability factors.*
-
----
-
-## 📂 Repository Structure
-
-- `src/data_analysis/`: Data cleaning, enrichment, and feature engineering logic.
-- `src/ml_models/`: ML training scripts, model artifacts, and **SHAP explainability** engine.
-- `src/discovery/`: Ranking algorithms and batch prediction system.
-- `src/analytics/`: The **Insight Engine** for automated research visualization.
-- `src/frontend/`: Source code for the **Streamlit** AI Discovery Explorer.
-- `analysis_outputs/`: Directory containing dynamically updated research plots and analytics.
-- `docs/`: Technical documentation including system architecture diagrams.
-- `pipeline_logs/`: Performance reports and execution logs for the automated orchestrator.
-
----
-
-## 🚀 Getting Started
-
-### 1. Installation
-Clone the repository and install the scientific stack:
-```bash
-git clone https://github.com/yourusername/exo-intel-platform.git
-cd exo-intel-platform
-pip install -r requirements.txt
-```
-
-### 2. Database Configuration
-Ensure PostgreSQL is running and update your connection string in `src/utils/db.py`:
-```python
-# Example URI
-DATABASE_URL = "postgresql://postgres:password@localhost:5432/exo_intel_db"
-```
-
-### 3. Execute the Autonomous Pipeline
-Run everything from data ingestion to scientific insights with one command:
-```bash
-python run_exointel_pipeline.py
-```
-
-### 4. Launch the Research Dashboard
-```bash
-streamlit run src/frontend/app.py
-```
-
----
-
-## 🐳 Deployment & Running with Docker
-
-ExoIntel is fully containerized for production-ready deployment.
-
-### 1. Configure Environment
-Copy the example environment file and update your database credentials:
 ```bash
 cp .env.example .env
 ```
 
-### 2. Launch with Docker Compose
-One command to spin up both the **Postgres Database** and the **Streamlit Application**:
+Ensure the following variables are correctly configured:
+*   `DB_USER`: Database username
+*   `DB_PASSWORD`: Database password
+*   `DB_HOST`: Database host address
+*   `DB_NAME`: Target database name
+
+### 3. Execution
+
+Initialize the full platform pipeline to rebuild all scientific artifacts:
+
+```bash
+python run_exointel_pipeline.py
+```
+
+Launch the interactive discovery dashboard for research exploration:
+
+```bash
+streamlit run src/frontend/app.py
+```
+
+## Deployment
+
+The ExoIntel platform is fully containerized for production consistency:
+
 ```bash
 docker-compose up --build
 ```
-- **Streamlit UI**: `http://localhost:8501`
-- **Postgres DB**: `localhost:5432`
 
----
+Access the dashboard at `http://localhost:8501`.
 
-## ⚙️ Configuration & Production Readiness
+## Scientific Validation
 
-The platform uses a centralized configuration system (`src/config/config.py`) that manages:
-- **Environment Variables**: All sensitive DB credentials and server ports are loaded via `.env`.
-- **System Health Checks**: `src/utils/system_health_check.py` automatically verifies DB connectivity, table schemas, and model artifacts before the pipeline runs.
-- **Structured Logging**: Detailed logs are written to `pipeline_logs/` using a standardized logger, enabling easy production monitoring.
+### Model Explainability (SHAP)
 
----
+ExoIntel prioritizes scientific transparency. By utilizing SHAP values, the platform identifies exactly which astrophysical parameters—such as planetary equilibrium temperature or stellar mass—positively or negatively influence the habitability predictions. 
 
-## 🔄 Updating the Repository
+### Data and Model Explanation
 
-To maintain the project's portfolio quality and stay synchronized with GitHub, use the automated sync utility:
+The habitability index is derived through a supervised learning process that incorporates planetary radius, mass, density, and stellar characteristics. The model is trained on curated astronomical datasets with rigorous outlier filtering to ensure robust predictive performance.
 
-### 1. Synchronize to GitHub
-Stage, commit, and push all recent changes (including code, documentation, and analysis plots) with a single command:
+## Synchronization Utility
+
+The project includes an automated synchronization script for repository maintenance:
+
 ```bash
-# Automated sync with timestamped message
-python github_sync.py
+# Sychronize updates with GitHub
+python github_sync.py -m "Feature: Integrated XAI waterfall plots"
 
-# Manual sync with custom message
-python github_sync.py -m "Integrated new SHAP waterfall plots"
+# Create a major release tag
+python github_sync.py -t v1.0.0
 ```
 
-### 2. Version Tagging
-Mark major milestones with semantic version tags (e.g., `v1.0.0`):
-```bash
-python github_sync.py -t v1.1.0
-```
-This will automatically create a local tag and push it to the GitHub repository.
+## Contribution Guidelines
+
+ExoIntel welcomes contributions from the scientific and engineering community. To propose changes:
+1. Fork the repository.
+2. Create a feature branch.
+3. Submit a pull request with detailed documentation of changes.
+
+## License
+
+This project is licensed under the MIT License.
 
 ---
-
-## 👤 Author
-**Sai Venkat**  
-*Data Scientist & Space Research Enthusiast*
-
----
-*Disclaimer: Habitability scores are generated by machine learning models based on current astronomical datasets and are intended for research demonstration purposes.*
+*ExoIntel AI Exoplanet Discovery Platform*

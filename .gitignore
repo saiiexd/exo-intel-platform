@@ -1,11 +1,35 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+
+# Environments
 .env
+.venv
 venv/
-.env/
+ENV/
+env.bak
+env.rm
+
+# Data and Models
+*.csv
+*.json
+*.pkl
 *.db
-.ipynb_checkpoints
-data/raw/*
-models/*
+*.sqlite
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+analysis_outputs/*.png
+analysis_outputs/*.txt
+pipeline_logs/*.log
+pipeline_logs/*.txt
+
+# Jupyter Notebooks
+.ipynb_checkpoints/

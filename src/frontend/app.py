@@ -1,3 +1,13 @@
+"""
+app.py
+======
+Interactive Discovery Explorer and Research Interface.
+
+Provides a unified frontend for real-time exoplanet data exploration, 
+candidate prioritization, and visualization of scientific insights. 
+Integrates PostgreSQL data availability with ML explainability (SHAP).
+"""
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px

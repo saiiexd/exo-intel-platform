@@ -1,20 +1,19 @@
 """
 dataset_analysis.py
 ===================
-ExoIntel – Phase 2: Dataset Intelligence & Feature Engineering
+Advanced Data Processing and Feature Engineering Module.
 
-This script connects to the PostgreSQL database, analyzes the raw exoplanet data,
-removes impossible and extreme outliers (using physical bounds, IQR, and Z-scores),
-and computes scientifically meaningful astrophysical features:
-1. Earth Similarity Score (ESS) approximation
-2. Stellar Habitability Factor
-3. Normalized Planetary Density Ratio
+This module executes automated data cleansing and feature engineering for the ExoIntel 
+platform. It performs outlier detection using physical constraints and statistical 
+methods (IQR/Z-score), manages data balancing, and derives advanced astrophysical 
+features critical for habitability prediction.
 
-The cleaned and enriched dataset is saved back to 'exoplanet_data.planets_enriched'
-and visualization reports are written to the 'analysis_outputs/' directory.
-
-Usage (from project root):
-    python -m src.data_analysis.dataset_analysis
+Process Flow:
+1. Data Ingestion from PostgreSQL.
+2. Statistical diagnostics and correlation analysis.
+3. Multi-stage outlier filtering and data balancing.
+4. Advanced feature derivation (Earth Similarity Score, Stellar Habitability Factor).
+5. Persistence of enriched datasets and generation of analytical reports.
 """
 
 import os
@@ -35,11 +34,7 @@ from src.utils.db import get_engine
 logger = setup_logger("DatasetAnalysis")
 warnings.filterwarnings("ignore")
 
-FEATURES = [
-    "planet_radius", "planet_mass", "planet_density",
-    "equilibrium_temperature", "stellar_temperature",
-    "stellar_mass", "stellar_radius"
-]
+FEATURES = config.FEATURE_LIST
 TARGET = "habitability_index"
 
 

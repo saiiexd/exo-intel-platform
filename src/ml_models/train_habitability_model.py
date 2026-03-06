@@ -1,17 +1,17 @@
 """
 train_habitability_model.py
-===========================
-ExoIntel – Robust Habitability Score Prediction Pipeline
+==========================
+Machine Learning Model Training Pipeline.
 
-Fixes the "Constant Prediction" issue by:
-1. Extrem outlier removal (physical bounds).
-2. Data balancing (downsampling major class 0.99).
-3. Multi-model evaluation (RF, GBR, HistGBR).
-4. Prediction variance validation.
-5. Target scaling to [0, 1].
+Optimizes and persists the habitability prediction model using supervised learning. 
+This module handles multi-model evaluation (Random Forest, Gradient Boosting, 
+HistGradientBoosting), hyperparameter tuning via cross-validation, and predictive 
+stability validation.
 
-Output:
-    src/ml_models/habitability_model.pkl   <- { "pipeline": p, "features": f, "y_scaler": s }
+Key Components:
+- Data pre-processing and balancing.
+- Min-max normalization for target parity.
+- Automated pipeline serialization with feature scaling and imputation.
 """
 
 import os
@@ -39,11 +39,7 @@ logger = setup_logger("ModelTraining")
 warnings.filterwarnings("ignore")
 
 # CONFIGURATION
-FEATURES = [
-    "planet_radius", "planet_mass", "planet_density",
-    "equilibrium_temperature", "stellar_temperature",
-    "stellar_mass", "stellar_radius"
-]
+FEATURES = config.FEATURE_LIST
 TARGET = "habitability_index"
 
 def load_data():

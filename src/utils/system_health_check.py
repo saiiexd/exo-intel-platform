@@ -1,3 +1,10 @@
+"""
+system_health_check.py
+======================
+Diagnostic utility for verifying the integrity of the ExoIntel platform.
+Checks database connectivity, schema availability, and required artifacts.
+"""
+
 import os
 import sys
 from sqlalchemy import create_engine, inspect
