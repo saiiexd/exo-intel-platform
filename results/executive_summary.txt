@@ -1,0 +1,18 @@
+
+    ExoIntel Research Results Summary
+    ==================================
+    Timestamp: 2026-03-06T16:43:41.880003
+    
+    1. Top Discovery Candidates
+    ---------------------------
+    No candidates found.
+    
+    2. Primary Scientific Drivers (SHAP)
+    ------------------------------------
+    No feature importance data.
+    
+    3. Population Analytics
+    -----------------------
+    Average Habitability Score: 0.8415850220123077
+    Total Verified Candidates: 4433
+    
