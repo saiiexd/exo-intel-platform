@@ -1,0 +1,134 @@
+Pipeline started at: 2026-03-05 23:40:23
+--------------------------------------------------------------------------------
+
+[1/5] Phase 2: Dataset Intelligence & Feature Engineering...
+Executing module: src.data_analysis.dataset_analysis
+  | ============================================================
+  |   ExoIntel – Dataset Intelligence & Feature Engineering
+  | ============================================================
+  | [1/6] Loading data from exoplanet_data.planets ...
+  |       Loaded 6,128 rows.
+  | [2/6] Running Data Quality Diagnostics ...
+  | --- Missing Value Percentages (%) ---
+  | planet_radius               0.815927
+  | planet_mass                 0.505875
+  | planet_density              1.207572
+  | equilibrium_temperature    25.261097
+  | stellar_temperature         4.650783
+  | stellar_mass                0.130548
+  | stellar_radius              5.042428
+  | --- Zero / Impossible Value Counts ---
+  | planet_radius             : 0.00%
+  | planet_mass               : 0.00%
+  | planet_density            : 0.00%
+  | equilibrium_temperature   : 0.00%
+  | stellar_temperature       : 0.00%
+  | stellar_mass              : 0.00%
+  | stellar_radius            : 0.00%
+  | --- Feature Variance ---
+  | planet_radius              2.961337e+01
+  | planet_mass                1.305957e+06
+  | planet_density             2.278001e+03
+  | equilibrium_temperature    2.153404e+05
+  | stellar_temperature        3.057141e+06
+  | stellar_mass               1.679972e-01
+  | stellar_radius             1.564829e+01
+  | [3/6] Applying Filters and Removing Outliers ...
+  |       Physical bounds applied: removed 11 rows.
+  |       Z-Score filtering applied: removed 222 rows.
+  |       Data Balanced: final dataset has 5,895 rows.
+  | [4/6] Engineering Scientifically Meaningful Features ...
+  |       Features added: 'earth_similarity_approx', 'stellar_habitability_factor', 'density_ratio'.
+  | [5/6] Generating Visual Reports ...
+  |       Saved 4 plots to 'E:\exo-intel-platform\analysis_outputs'.
+  | [6/6] Writing Enriched Dataset to PostgreSQL ...
+  |       Successfully wrote 'exoplanet_data.planets_enriched' to the database.
+  | ✅ Phase 2 complete. Enriched dataset is ready for advanced modeling.
+  | ============================================================
+[OK] Completed in 4.21 seconds.
+
+[2/5] Phase 1: Machine Learning Model Training...
+Executing module: src.ml_models.train_habitability_model
+  | [1/6] Loading data from PostgreSQL...
+  |       Loaded 6128 rows.
+  | [2/6] Cleaning and balancing data...
+  |       Rows with 0.99: 0
+  |       Rows with other values: 5760
+  |       Target range: [0.0000, 1.0000]
+  |       Balanced dataset size: 5760
+  | [3/6] Comparing models and tuning...
+  |       RandomForest         | R2:  0.9627 | Pred Std:  0.0568
+  |       GradientBoosting     | R2:  0.9682 | Pred Std:  0.0560
+  |       HistGradientBoosting | R2:  0.8368 | Pred Std:  0.0535
+  |       Selected Best Model: GradientBoosting
+  | [4/6] Tuning GradientBoosting...
+  | [5/6] Final Evaluation...
+  |       R2 Score        : 0.9704
+  |       RMSE            : 0.0098
+  |       MAE             : 0.0018
+  |       Prediction Std  : 0.0561
+  |       ✅ Model shows healthy prediction variability.
+  | [6/6] Saving artifact...
+  |       Model saved to E:\exo-intel-platform\src\ml_models\habitability_model.pkl
+[OK] Completed in 12.16 seconds.
+
+[3/5] Phase 3: Planet Discovery & Ranking Engine...
+Executing module: src.discovery.planet_discovery_engine
+  | =================================================================
+  |   ExoIntel – Phase 3: Planet Discovery & Ranking Engine
+  | =================================================================
+  | [1/5] Loading Enriched Data from DB ...
+  |       Loaded 4,433 planets (dropped 1,462 due to missing ML features).
+  | [2/5] Running Batch ML Inference ...
+  |       Generated predictions for 4,433 planets.
+  | [3/5] Computing Ranks and Combined Scores ...
+  |       Top 5 Candidates Found:
+  |         #1 | Kepler-1649 b        | Score: 0.883 (ML: 0.851)
+  |         #2 | Teegarden's Star b   | Score: 0.852 (ML: 0.851)
+  |         #3 | TOI-700 e            | Score: 0.845 (ML: 0.851)
+  |         #4 | GJ 1002 b            | Score: 0.840 (ML: 0.851)
+  |         #5 | Proxima Cen b        | Score: 0.831 (ML: 0.851)
+  | [4/5] Generating Visual Discovery Analytics ...
+  |       Saved 3 plots to 'E:\exo-intel-platform\analysis_outputs'.
+  | [5/5] Writing Discovery Results to PostgreSQL ...
+  |       Successfully wrote 'exoplanet_data.habitable_planet_candidates' to DB.
+  | ✅ Phase 3 Complete. The AI Discovery Catalogue is fully built.
+  | =================================================================
+[OK] Completed in 4.18 seconds.
+
+[4/5] Phase 5: Explainable AI (SHAP) Engine...
+Executing module: src.ml_models.explainability_engine
+  | =================================================================
+  |   ExoIntel – Phase 5: XAI for Habitability Predictions
+  | =================================================================
+  | [1/5] Loading Enriched Dataset ...
+  | [2/5] Loading the Trained ML Model ...
+  | [3/5] Computing SHAP Values (TreeExplainer) ...
+  | [4/5] Generating SHAP Visualization Reports ...
+  |       Selected example for local explanation: Proxima Cen b
+  | [5/5] Exporting Feature Importance to DB ...
+  |       Saved feature importance summary to 'exoplanet_data.feature_importance_analysis'.
+  | ✅ Phase 5 Complete. XAI Engine integration finished.
+  | =================================================================
+[OK] Completed in 5.18 seconds.
+
+[5/5] Phase 6: Scientific Insight Engine...
+Executing module: src.analytics.insight_engine
+  | =================================================================
+  |   ExoIntel – Phase 6: Scientific Insight Engine
+  | =================================================================
+  | [1/4] Loading Datasets from PostgreSQL ...
+  |       Loaded 4,433 planets with ML predictions.
+  | [2/4] Computing Analytical Summaries ...
+  |       Found 728 star systems hosting multiple potentially habitable planets.
+  | [3/4] Exporting Insights to PostgreSQL ...
+  |       Successfully wrote structural insight tables to the database.
+  | [4/4] Generating Visual Analysis Reports ...
+  |       Saved 4 analytical plots to 'E:\exo-intel-platform\analysis_outputs'.
+  | ✅ Phase 6 Complete. Scientific Insight Engine finished.
+  | =================================================================
+[OK] Completed in 4.70 seconds.
+
+================================================================================
+✅ Pipeline COMPLETED SUCCESSFULLY in 30.73 seconds.
+================================================================================

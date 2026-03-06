@@ -29,23 +29,12 @@ import pandas as pd
 import numpy as np
 import joblib
 
-# Support running from root path
-_here = os.path.dirname(os.path.abspath(__file__))
-_src = os.path.dirname(_here)
-_root = os.path.dirname(_src)
-if _src not in sys.path:
-    sys.path.insert(0, _src)
-if _root not in sys.path:
-    sys.path.insert(0, _root)
+from src.config.config import config
+from src.utils.logger import setup_logger
+from src.utils.db import get_engine
 
-from utils.db import get_engine
-
+logger = setup_logger("DiscoveryEngine")
 warnings.filterwarnings("ignore")
-
-OUT_DIR = os.path.join(_root, "analysis_outputs")
-os.makedirs(OUT_DIR, exist_ok=True)
-
-MODEL_PATH = os.path.join(_src, "ml_models", "habitability_model.pkl")
 
 # ML model expected features
 FEATURES = [
@@ -56,159 +45,95 @@ FEATURES = [
 
 
 def load_enriched_data():
-    print("\n[1/5] Loading Enriched Data from DB ...")
+    logger.info("Loading Enriched Data from DB ...")
     engine = get_engine()
     df = pd.read_sql("SELECT * FROM exoplanet_data.planets_enriched", engine)
     
-    # Drop rows with nulls in features necessary for ML prediction
     original_len = len(df)
     df = df.dropna(subset=FEATURES)
-    print(f"      Loaded {len(df):,} planets (dropped {original_len - len(df):,} due to missing ML features).")
+    logger.info(f"Loaded {len(df):,} planets (dropped {original_len - len(df):,} due to missing ML features).")
     return df
 
 
 def generate_ml_predictions(df):
-    print("\n[2/5] Running Batch ML Inference ...")
+    logger.info("Running Batch ML Inference ...")
     
-    if not os.path.exists(MODEL_PATH):
-        raise FileNotFoundError(f"Model artifact not found at {MODEL_PATH}")
+    if not os.path.exists(config.MODEL_PATH):
+        raise FileNotFoundError(f"Model artifact not found at {config.MODEL_PATH}")
         
-    artifact = joblib.load(MODEL_PATH)
+    artifact = joblib.load(config.MODEL_PATH)
     model = artifact.get("pipeline", artifact)
     features_list = artifact.get("features", FEATURES)
     
-    # Ensure correct feature order as trained
     X_pred = df[features_list]
-    
-    # Run predictions and clamp
     raw_preds = model.predict(X_pred)
     df["ml_habitability_score"] = np.clip(raw_preds, 0.0, 1.0)
     
-    print(f"      Generated predictions for {len(df):,} planets.")
+    logger.info(f"Generated predictions for {len(df):,} planets.")
     return df
 
 
 def rank_candidates(df):
-    print("\n[3/5] Computing Ranks and Combined Scores ...")
-    
-    # Combined Discovery Score (60% ML, 40% ESS approx)
-    # The ESS was engineered in Phase 2
-    ml_weight = 0.6
-    ess_weight = 0.4
+    logger.info("Computing Ranks and Combined Scores ...")
+    ml_weight, ess_weight = 0.6, 0.4
     
     df["combined_discovery_score"] = (
         (df["ml_habitability_score"] * ml_weight) + 
         (df["earth_similarity_approx"] * ess_weight)
     )
-    
-    # Rank them (1 is best)
     df["discovery_rank"] = df["combined_discovery_score"].rank(method="min", ascending=False).astype(int)
-    
-    # Percentile
     df["discovery_percentile"] = df["combined_discovery_score"].rank(pct=True) * 100
-    
-    # Sort the dataframe so index represents actual top-down ordering
     df = df.sort_values(by="discovery_rank").reset_index(drop=True)
     
-    print("      Top 5 Candidates Found:")
-    for i, row in df.head(5).iterrows():
-        print(f"        #{row['discovery_rank']} | {row['planet_name']:<20} | Score: {row['combined_discovery_score']:.3f} (ML: {row['ml_habitability_score']:.3f})")
-        
+    logger.info("Discovery ranking complete.")
     return df
 
 
 def generate_visuals(df):
-    print("\n[4/5] Generating Visual Discovery Analytics ...")
+    logger.info("Generating Visual Discovery Analytics ...")
     
-    # 05_top_20_candidates.png
-    top_20 = df.head(20).copy()
-    top_20 = top_20.sort_values(by="combined_discovery_score", ascending=True) # for horizontal bar chart
-    
+    # Top 20 Candidates
+    top_20 = df.head(20).copy().sort_values(by="combined_discovery_score", ascending=True)
     plt.figure(figsize=(12, 8))
-    sns.barplot(
-        x="combined_discovery_score", 
-        y="planet_name", 
-        data=top_20,
-        palette="viridis"
-    )
-    plt.title("Top 20 Habitable Exoplanet Candidates")
-    plt.xlabel("Combined Discovery Score")
-    plt.ylabel("")
+    sns.barplot(x="combined_discovery_score", y="planet_name", data=top_20, palette="viridis")
     plt.tight_layout()
-    plt.savefig(os.path.join(OUT_DIR, "05_top_20_candidates.png"))
+    plt.savefig(os.path.join(config.OUTPUT_DIR, "05_top_20_candidates.png"))
     plt.close()
     
-    # 06_ml_vs_ess_scatter.png
+    # ML vs ESS Scatter
     plt.figure(figsize=(9, 7))
-    sns.scatterplot(
-        x="earth_similarity_approx", 
-        y="ml_habitability_score", 
-        hue="stellar_habitability_factor",
-        size="combined_discovery_score",
-        sizes=(20, 200),
-        palette="magma",
-        alpha=0.8,
-        data=df
-    )
-    # Add a y=x consensus line
-    plt.plot([0, 1], [0, 1], 'k--', lw=1, alpha=0.5)
-    plt.title("ML Prediction Consensus vs. Physical Similarity")
-    plt.xlabel("Earth Similarity Score (ESS)")
-    plt.ylabel("ML-Predicted Habitability Score")
-    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-    plt.tight_layout()
-    plt.savefig(os.path.join(OUT_DIR, "06_ml_vs_ess_scatter.png"))
+    sns.scatterplot(x="earth_similarity_approx", y="ml_habitability_score", hue="stellar_habitability_factor", data=df)
+    plt.savefig(os.path.join(config.OUTPUT_DIR, "06_ml_vs_ess_scatter.png"))
     plt.close()
     
-    # 07_discovery_correlations.png
-    cols_to_corr = [
-        "planet_radius", "planet_mass", "equilibrium_temperature",
-        "stellar_temperature", "stellar_mass",
-        "earth_similarity_approx", "stellar_habitability_factor",
-        "ml_habitability_score", "combined_discovery_score"
-    ]
+    # Correlation Heatmap
+    cols = ["planet_radius", "planet_mass", "equilibrium_temperature", "ml_habitability_score", "combined_discovery_score"]
     plt.figure(figsize=(10, 8))
-    corr = df[cols_to_corr].corr()
-    sns.heatmap(corr, annot=True, cmap="YlGnBu", fmt=".2f")
-    plt.title("Correlation Heatmap: Discovery Engine Metrics")
-    plt.tight_layout()
-    plt.savefig(os.path.join(OUT_DIR, "07_discovery_correlations.png"))
+    sns.heatmap(df[cols].corr(), annot=True, cmap="YlGnBu")
+    plt.savefig(os.path.join(config.OUTPUT_DIR, "07_discovery_correlations.png"))
     plt.close()
     
-    print(f"      Saved 3 plots to '{OUT_DIR}'.")
+    logger.info(f"Discovery visuals saved to {config.OUTPUT_DIR}")
 
 
 def save_candidates_to_db(df):
-    print("\n[5/5] Writing Discovery Results to PostgreSQL ...")
+    logger.info("Writing Discovery Results to PostgreSQL ...")
     engine = get_engine()
-    
     try:
-        df.to_sql(
-            name="habitable_planet_candidates",
-            schema="exoplanet_data",
-            con=engine,
-            if_exists="replace",
-            index=False
-        )
-        print("      Successfully wrote 'exoplanet_data.habitable_planet_candidates' to DB.")
+        df.to_sql(name="habitable_planet_candidates", schema="exoplanet_data", con=engine, if_exists="replace", index=False)
+        logger.info("Successfully wrote 'exoplanet_data.habitable_planet_candidates' to DB.")
     except Exception as e:
-        print(f"      Error writing to database: {e}")
+        logger.error(f"Error writing to database: {e}")
 
 
 def main():
-    print("=" * 65)
-    print("  ExoIntel – Phase 3: Planet Discovery & Ranking Engine")
-    print("=" * 65)
-    
+    logger.info("Starting Planet Discovery Pipeline")
     df_raw = load_enriched_data()
     df_scored = generate_ml_predictions(df_raw)
     df_ranked = rank_candidates(df_scored)
-    
     generate_visuals(df_ranked)
     save_candidates_to_db(df_ranked)
-    
-    print("\n✅ Phase 3 Complete. The AI Discovery Catalogue is fully built.")
-    print("=" * 65)
+    logger.info("Planet Discovery Pipeline Complete.")
 
 
 if __name__ == "__main__":

@@ -2,9 +2,15 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from sqlalchemy import create_engine
-import joblib
-import numpy as np
 import os
+import sys
+
+# Ensure project root is in path for imports
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from src.config.config import config
 
 st.set_page_config(page_title="ExoIntel AI Discovery Explorer", layout="wide")
 
@@ -18,10 +24,57 @@ machine learning predictions with analytical physical similarity metrics.
 
 st.divider()
 
+# --- Platform Metrics ---
+def load_platform_metrics():
+    engine = create_engine(config.DATABASE_URL)
+    try:
+        # 1. Total Planets Analyzed
+        total_planets = pd.read_sql("SELECT COUNT(*) FROM exoplanet_data.planets_enriched", engine).iloc[0, 0]
+        
+        # 2. Total Candidates
+        total_candidates = pd.read_sql("SELECT COUNT(*) FROM exoplanet_data.habitable_planet_candidates", engine).iloc[0, 0]
+        
+        # 3. Highest ML Score
+        max_ml_score = pd.read_sql("SELECT MAX(ml_habitability_score) FROM exoplanet_data.habitable_planet_candidates", engine).iloc[0, 0]
+        
+        # 4. Multi-Planet Habitable Systems (score >= 0.7)
+        # Checking if host_star is available, if not joining with enriched
+        multi_planet_query = """
+        SELECT COUNT(*) FROM (
+            SELECT hpc.host_star 
+            FROM exoplanet_data.habitable_planet_candidates hpc
+            JOIN exoplanet_data.planets_enriched pe ON hpc.planet_name = pe.planet_name
+            WHERE hpc.ml_habitability_score >= 0.7
+            GROUP BY hpc.host_star
+            HAVING COUNT(hpc.planet_name) > 1
+        ) as sub
+        """
+        num_multi_systems = pd.read_sql(multi_planet_query, engine).iloc[0, 0]
+        
+        return {
+            "total_planets": total_planets,
+            "total_candidates": total_candidates,
+            "max_ml_score": max_ml_score if max_ml_score else 0.0,
+            "num_multi_systems": num_multi_systems
+        }
+    except Exception as e:
+        st.error(f"Metrics load failed: {e}")
+        return None
+
+metrics = load_platform_metrics()
+
+if metrics:
+    m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+    m_col1.metric("Planets Analyzed", f"{metrics['total_planets']:,}")
+    m_col2.metric("Discovery Candidates", f"{metrics['total_candidates']:,}")
+    m_col3.metric("Multi-Planet Systems", metrics["num_multi_systems"])
+    m_col4.metric("Highest Habitability", f"{metrics['max_ml_score']:.3f}")
+
+st.divider()
+
 # Only load the necessary columns from the discovery table for optimized loading
-@st.cache_data
 def load_discovery_data():
-    engine = create_engine("postgresql://postgres:saivenkat143@localhost:5432/exo_intel_db")
+    engine = create_engine(config.DATABASE_URL)
     query = """
     SELECT
         planet_name,
@@ -136,72 +189,75 @@ colL.metric("Stellar Habitability Factor", round(planet_details["stellar_habitab
 
 st.divider()
 
-# --- Section 5: Habitability Prediction Simulator (Legacy) ---
-st.header("5. Hypothetical Planet Simulator")
+# --- Section 5: AI Research Insights ---
+st.header("5. AI Research Insights")
+st.markdown("This section explores visual scientific insights and machine learning explainability outputs generated continuously by the automated ExoIntel pipeline.")
+
+st.subheader("Scientific Insights")
+
 st.markdown("""
-Use the sliders below to simulate a completely hypothetical planet and evaluate its potential habitability 
-using our trained machine learning model.
+**Habitability vs Stellar Temperature**  
+This scatter plot demonstrates the relationship between planetary habitability scores and the temperature of their host stars.
 """)
+if os.path.exists(os.path.join(config.OUTPUT_DIR, "11_habitability_vs_stellar_temp.png")):
+    st.image(os.path.join(config.OUTPUT_DIR, "11_habitability_vs_stellar_temp.png"), use_container_width=True)
+else:
+    st.info("Insights plot not found. Run the pipeline to generate it.")
 
-col1_sim, col2_sim = st.columns(2)
+st.markdown("""
+**Habitability by Discovery Method**  
+A bar chart highlighting average planetary habitability scores classified by the astronomical method used for their discovery.
+""")
+if os.path.exists(os.path.join(config.OUTPUT_DIR, "12_habitability_by_discovery_method.png")):
+    st.image(os.path.join(config.OUTPUT_DIR, "12_habitability_by_discovery_method.png"), use_container_width=True)
+else:
+    st.info("Insights plot not found. Run the pipeline to generate it.")
 
-planet_radius_sim = col1_sim.slider("Planet Radius (Earth Radii)", 0.1, 20.0, 1.0)
-planet_mass_sim = col2_sim.slider("Planet Mass (Earth Mass)", 0.1, 50.0, 1.0)
+st.markdown("""
+**Habitability Score Distribution**  
+A histogram showing the overall distribution of ML-assigned habitability scores across the selected universe of exoplanet data.
+""")
+if os.path.exists(os.path.join(config.OUTPUT_DIR, "13_habitability_score_distribution.png")):
+    st.image(os.path.join(config.OUTPUT_DIR, "13_habitability_score_distribution.png"), use_container_width=True)
+else:
+    st.info("Insights plot not found. Run the pipeline to generate it.")
 
-planet_density_sim = col1_sim.slider("Planet Density", 0.1, 20.0, 5.5)
-equilibrium_temperature_sim = col2_sim.slider("Equilibrium Temperature (Kelvin)", 50.0, 2000.0, 288.0)
+st.markdown("""
+**Insight Correlation Heatmap**  
+A correlation heatmap visualizing underlying statistical relationships between various planetary constraints and stellar metrics.
+""")
+if os.path.exists(os.path.join(config.OUTPUT_DIR, "14_insight_correlation_heatmap.png")):
+    st.image(os.path.join(config.OUTPUT_DIR, "14_insight_correlation_heatmap.png"), use_container_width=True)
+else:
+    st.info("Insights plot not found. Run the pipeline to generate it.")
 
-stellar_temperature_sim = col1_sim.slider("Host Star Temperature (Kelvin)", 2000.0, 10000.0, 5500.0)
-stellar_mass_sim = col2_sim.slider("Host Star Mass (Solar Mass)", 0.1, 5.0, 1.0)
+st.divider()
 
-stellar_radius_sim = st.slider("Host Star Radius (Solar Radius)", 0.1, 10.0, 1.0)
+st.subheader("Model Explainability (SHAP)")
 
-predict_button = st.button("Predict Habitability for Hypothetical Planet")
+st.markdown("""
+**Global SHAP Feature Importance**  
+Identifies the most significant astrophysical features driving the machine learning model's predictive habitability decisions globally.
+""")
+if os.path.exists(os.path.join(config.OUTPUT_DIR, "08_shap_global_importance.png")):
+    st.image(os.path.join(config.OUTPUT_DIR, "08_shap_global_importance.png"), use_container_width=True)
+else:
+    st.info("Explainability plot not found. Run the pipeline to generate it.")
 
-# Handle model loading centrally
-model_path = "src/ml_models/habitability_model.pkl"
-model = None
-features_list = [
-    "planet_radius", "planet_mass", "planet_density",
-    "equilibrium_temperature", "stellar_temperature",
-    "stellar_mass", "stellar_radius"
-]
+st.markdown("""
+**SHAP Summary Plot**  
+Visualizes the aggregate distribution of SHAP impact values for features, demonstrating how feature variations shift predictions positively or negatively.
+""")
+if os.path.exists(os.path.join(config.OUTPUT_DIR, "09_shap_summary_plot.png")):
+    st.image(os.path.join(config.OUTPUT_DIR, "09_shap_summary_plot.png"), use_container_width=True)
+else:
+    st.info("Explainability plot not found. Run the pipeline to generate it.")
 
-if os.path.exists(model_path):
-    artifact = joblib.load(model_path)
-    model = artifact.get("pipeline", artifact) # Handle both dict and raw pipeline
-    features_list = artifact.get("features", features_list)
-
-if predict_button:
-    if model is not None:
-        input_data = {
-            "planet_radius": planet_radius_sim,
-            "planet_mass": planet_mass_sim,
-            "planet_density": planet_density_sim,
-            "equilibrium_temperature": equilibrium_temperature_sim,
-            "stellar_temperature": stellar_temperature_sim,
-            "stellar_mass": stellar_mass_sim,
-            "stellar_radius": stellar_radius_sim
-        }
-        input_df = pd.DataFrame([input_data])[features_list]
-
-        raw_prediction = model.predict(input_df)[0]
-        prediction = float(raw_prediction)
-        
-        with st.expander("🔍 Predictor Debug Info"):
-            st.write("Constructed Input DataFrame:")
-            st.dataframe(input_df)
-            st.write(f"Raw Model Prediction: {raw_prediction}")
-            st.write(f"Clamped Prediction: {max(0.0, min(1.0, prediction))}")
-
-        prediction = max(0.0, min(1.0, prediction))
-
-        st.subheader("Prediction Result")
-        st.metric("Predicted Habitability Score", round(prediction, 3))
-
-        if prediction > 0.8:
-            st.success("This simulated planet shows strong potential for habitability based on model predictions.")
-        elif prediction > 0.5:
-            st.warning("This planet may have moderate habitability potential.")
-        else:
-            st.error("This planet is unlikely to support Earth-like conditions.")
+st.markdown("""
+**Planet Explanation Waterfall Plot (Proxima Cen b)**  
+A deeply localized explainability waterfall showing how individual astronomical features sequentially accumulated to determine the final machine learning score for Proxima Cen b.
+""")
+if os.path.exists(os.path.join(config.OUTPUT_DIR, "10_shap_waterfall_Proxima_Cen_b.png")):
+    st.image(os.path.join(config.OUTPUT_DIR, "10_shap_waterfall_Proxima_Cen_b.png"), use_container_width=True)
+else:
+    st.info("Explainability plot not found. Run the pipeline to generate it.")

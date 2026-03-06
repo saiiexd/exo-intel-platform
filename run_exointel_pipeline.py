@@ -1,100 +1,156 @@
 import os
 import sys
-import time
 import subprocess
-import datetime
-import traceback
+import time
+from datetime import datetime
+
+from src.config.config import config
+from src.utils.logger import setup_logger
+from src.utils.system_health_check import run_health_check
+
+logger = setup_logger("PipelineOrchestrator")
+
+# Define the pipeline steps as modules for robust execution
+PIPELINE_STEPS = [
+    {
+        "name": "Dataset Analysis",
+        "module": "src.data_analysis.dataset_analysis",
+        "description": "Step 1: Running dataset analysis to rebuild cleaned and enriched dataset..."
+    },
+    {
+        "name": "Habitability Model Training",
+        "module": "src.ml_models.train_habitability_model",
+        "description": "Step 2: Training habitability model..."
+    },
+    {
+        "name": "Planet Discovery Engine",
+        "module": "src.discovery.planet_discovery_engine",
+        "description": "Step 3: Running discovery engine to rank habitable planet candidates..."
+    },
+    {
+        "name": "Explainability Engine",
+        "module": "src.ml_models.explainability_engine",
+        "description": "Step 4: Computing explainability SHAP metrics..."
+    },
+    {
+        "name": "Insight Engine",
+        "module": "src.analytics.insight_engine",
+        "description": "Step 5: Generating scientific insights and visual analytics..."
+    },
+    {
+        "name": "Discovery Summary Generator",
+        "module": "src.analytics.discovery_summary_generator",
+        "description": "Step 6: Generating high-level discovery research summary report..."
+    }
+]
 
 def main():
-    print("=" * 80)
-    print("                 ExoIntel – Automated Pipeline Orchestrator")
-    print("=" * 80)
-    print("This orchestrator runs the complete ExoIntel AI analytics pipeline end-to-end:")
-    print("  1. Dataset Intelligence & Feature Engineering")
-    print("  2. Machine Learning Model Training")
-    print("  3. Planet Discovery & Ranking Engine")
-    print("  4. Explainable AI (SHAP) Engine")
-    print("  5. Scientific Insight Engine\n")
-
     start_time = time.time()
+    timestamp_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     
-    # Establish logging
-    log_dir = "pipeline_logs"
-    os.makedirs(log_dir, exist_ok=True)
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_file_path = os.path.join(log_dir, f"pipeline_run_{timestamp}.log")
+    report_file_path = os.path.join(config.LOGS_DIR, f"execution_report_{timestamp_str}.txt")
     
-    def log_and_print(msg):
-        print(msg)
-        with open(log_file_path, "a", encoding="utf-8") as f:
-            f.write(msg + "\n")
-            
-    log_and_print(f"Pipeline started at: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    log_and_print("-" * 80)
-
-    # Define the sequence of modules to run
-    # Format: (Step Name, module_path)
-    pipeline_steps = [
-        ("Phase 2: Dataset Intelligence & Feature Engineering", "src.data_analysis.dataset_analysis"),
-        ("Phase 1: Machine Learning Model Training", "src.ml_models.train_habitability_model"),
-        ("Phase 3: Planet Discovery & Ranking Engine", "src.discovery.planet_discovery_engine"),
-        ("Phase 5: Explainable AI (SHAP) Engine", "src.ml_models.explainability_engine"),
-        ("Phase 6: Scientific Insight Engine", "src.analytics.insight_engine")
-    ]
-
-    has_error = False
-
-    for i, (step_name, module_path) in enumerate(pipeline_steps, 1):
-        step_start = time.time()
-        log_and_print(f"\n[{i}/{len(pipeline_steps)}] {step_name}...")
-        log_and_print(f"Executing module: {module_path}")
+    print("="*60)
+    print(f"🚀 Starting ExoIntel Pipeline Orchestrator at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("="*60)
+    
+    # Run Health Check First
+    if not run_health_check():
+        print("\n❌ Pipeline aborted: System health check failed.")
+        sys.exit(1)
+        
+    execution_details = []
+    pipeline_success = True
+    
+    for i, step in enumerate(PIPELINE_STEPS, 1):
+        step_name = step["name"]
+        module_path = step["module"]
+        description = step["description"]
+        
+        logger.info(f"Executing {step_name}...")
+        print(f"\n{description}")
+        
+        step_start_time = time.time()
         
         try:
-            # Run the module as a subprocess to keep environments isolated
-            result = subprocess.run(
-                [sys.executable, "-m", module_path],
-                capture_output=True,
-                text=True,
-                check=True
-            )
-            step_duration = time.time() - step_start
+            # Execute the script as a module
+            result = subprocess.run([sys.executable, "-m", module_path], check=True, capture_output=True, text=True)
+            step_duration = time.time() - step_start_time
             
-            # Print output nicely
-            output_lines = result.stdout.strip().split('\n')
-            for line in output_lines:
-                if line.strip():
-                    log_and_print(f"  | {line}")
+            logger.info(f"✅ {step_name} completed in {step_duration:.2f}s")
+            print(f"✅ {step_name} completed successfully in {step_duration:.2f} seconds.")
             
-            log_and_print(f"[OK] Completed in {step_duration:.2f} seconds.")
+            execution_details.append({
+                "step": i,
+                "name": step_name,
+                "status": "SUCCESS",
+                "duration": step_duration,
+                "output": result.stdout
+            })
             
         except subprocess.CalledProcessError as e:
-            has_error = True
-            step_duration = time.time() - step_start
-            log_and_print(f"[ERROR] Step failed after {step_duration:.2f} seconds with exit code {e.returncode}.")
-            log_and_print("\nStandard Output:")
-            log_and_print(e.stdout)
-            log_and_print("\nStandard Error:")
-            log_and_print(e.stderr)
-            break
+            step_duration = time.time() - step_start_time
+            logger.error(f"❌ {step_name} FAILED: {e.stderr}")
+            print(f"❌ {step_name} FAILED after {step_duration:.2f} seconds.")
+            print(f"Error Output:\n{e.stderr}")
+            
+            execution_details.append({
+                "step": i,
+                "name": step_name,
+                "status": "FAILED",
+                "duration": step_duration,
+                "error": e.stderr,
+                "output": e.stdout
+            })
+            
+            pipeline_success = False
+            break # Stop the pipeline if a step fails
         except Exception as e:
-            has_error = True
-            log_and_print(f"[ERROR] Unexpected exception: {str(e)}")
-            log_and_print(traceback.format_exc())
+            step_duration = time.time() - step_start_time
+            logger.exception(f"❌ {step_name} encountered an unexpected error.")
+            print(f"❌ {step_name} FAILED due to unexpected error after {step_duration:.2f} seconds.")
+            print(f"Exception: {str(e)}")
+            
+            execution_details.append({
+                "step": i,
+                "name": step_name,
+                "status": "ERROR",
+                "duration": step_duration,
+                "error": str(e),
+                "output": ""
+            })
+            
+            pipeline_success = False
             break
 
     total_duration = time.time() - start_time
+    status_str = "SUCCESS" if pipeline_success else "FAILED"
     
-    log_and_print("\n" + "=" * 80)
-    if has_error:
-        log_and_print(f"❌ Pipeline FAILED after {total_duration:.2f} seconds.")
-    else:
-        log_and_print(f"✅ Pipeline COMPLETED SUCCESSFULLY in {total_duration:.2f} seconds.")
-    log_and_print("=" * 80)
+    print("\n" + "="*60)
+    print(f"🛑 ExoIntel Pipeline Finished - Status: {status_str} - Total Time: {total_duration:.2f}s")
+    print("="*60)
     
-    print(f"\nExecution summary log saved to: {log_file_path}")
-    
-    if has_error:
-        sys.exit(1)
+    # Write the report to a log file
+    with open(report_file_path, "w", encoding="utf-8") as f:
+        f.write("============================================================\n")
+        f.write(f"ExoIntel Pipeline Execution Report\n")
+        f.write(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write(f"Status: {status_str}\n")
+        f.write(f"Total Pipeline Duration: {total_duration:.2f} seconds\n")
+        f.write("============================================================\n\n")
+        
+        f.write("Step Details:\n")
+        f.write("-" * 30 + "\n")
+        for detail in execution_details:
+            f.write(f"Step {detail['step']}: {detail['name']}\n")
+            f.write(f"Status: {detail['status']}\n")
+            f.write(f"Duration: {detail['duration']:.2f} seconds\n")
+            if detail['status'] != "SUCCESS":
+                f.write(f"Error:\n{detail.get('error', '')}\n")
+            f.write("-" * 30 + "\n")
+
+    logger.info(f"Pipeline finished with status: {status_str}")
+    print(f"\n📝 Detailed execution report saved to: {report_file_path}\n")
 
 if __name__ == "__main__":
     main()

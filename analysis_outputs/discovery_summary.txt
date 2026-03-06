@@ -1,0 +1,24 @@
+============================================================
+      ExoIntel – Autonomous AI Discovery Summary
+============================================================
+
+Total Planets Processed:   5,895
+Habitable Candidates:      4,433
+Highest ML Score:          0.9930
+Multi-Planet Hab. Systems: 725
+
+------------------------------------------------------------
+🏆 TOP DISCOVERY CANDIDATE
+------------------------------------------------------------
+Name:            Kepler-1649 b
+Discovery Score: 0.8831
+
+DISCOVERY LOG:
+The ExoIntel pipeline has successfully analyzed 5895 planetary systems.
+Out of these, 4433 have been identified as high-priority candidates.
+Notably, 725 star systems host multiple potentially habitable planets.
+The leading candidate for future observation is Kepler-1649 b.
+
+------------------------------------------------------------
+Generated automatically by ExoIntel Pipeline Orchestrator.
+============================================================
