@@ -82,6 +82,63 @@ if metrics:
 
 st.divider()
 
+# --- Platform Intelligence Metrics ---
+st.header("Platform Intelligence Metrics")
+st.markdown("Real-time monitoring of pipeline performance, model health, and discovery yields.")
+
+def load_intelligence_metrics():
+    engine = create_engine(config.DATABASE_URL)
+    intelligence = {}
+    try:
+        # Pipeline Performance
+        intelligence["pipeline"] = pd.read_sql("SELECT timestamp, total_duration_sec, status FROM platform_metrics.pipeline_runs ORDER BY timestamp DESC LIMIT 10", engine)
+        
+        # Model Metrics
+        intelligence["model"] = pd.read_sql("SELECT model_version, r2_score, rmse, mae, timestamp FROM platform_metrics.model_performance ORDER BY timestamp DESC LIMIT 1", engine)
+        
+        # Discovery Summary
+        intelligence["summary"] = pd.read_sql("SELECT * FROM exoplanet_data.discovery_summary_snapshot", engine)
+        
+    except Exception as e:
+        st.warning("Intelligence metrics not yet available. Run the autonomous pipeline to generate.")
+    return intelligence
+
+intel = load_intelligence_metrics()
+
+if intel.get("pipeline") is not None and not intel["pipeline"].empty:
+    i_col1, i_col2 = st.columns([2, 1])
+    
+    with i_col1:
+        st.subheader("Pipeline Execution History")
+        fig_duration = px.line(intel["pipeline"], x="timestamp", y="total_duration_sec", markers=True, 
+                               title="Pipeline Runtime (Seconds)", labels={"total_duration_sec": "Duration (s)", "timestamp": "Execution Time"})
+        st.plotly_chart(fig_duration, use_container_width=True)
+        
+    with i_col2:
+        st.subheader("Latest Model Status")
+        if not intel["model"].empty:
+            m_data = intel["model"].iloc[0]
+            st.metric("Model Version", m_data["model_version"])
+            st.metric("R² Score", f"{m_data['r2_score']:.3f}")
+            st.metric("RMSE", f"{m_data['rmse']:.4f}")
+        else:
+            st.info("No model performance data available.")
+
+    st.subheader("Discovery Yield Snapshot")
+    if not intel["summary"].empty:
+        s_data = intel["summary"].iloc[0]
+        s_col1, s_col2, s_col3, s_col4 = st.columns(4)
+        s_col1.metric("Snapshot Date", datetime.fromisoformat(s_data["timestamp"]).strftime("%Y-%m-%d"))
+        s_col2.metric("Avg Discovery Score", f"{s_data['average_score']:.4f}")
+        s_col3.metric("Predicted Top Target", s_data["top_candidate"])
+        s_col4.metric("Avg Stellar Temp", f"{s_data['avg_stellar_temp']:.1f} K")
+    else:
+        st.info("No discovery summary snapshot available.")
+else:
+    st.info("Platform intelligence data will appear here after the first automated pipeline execution.")
+
+st.divider()
+
 # Only load the necessary columns from the discovery table for optimized loading
 def load_discovery_data():
     engine = create_engine(config.DATABASE_URL)

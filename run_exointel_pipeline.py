@@ -61,10 +61,20 @@ RESEARCH_STEPS = [
         "name": "Results Aggregator",
         "module": "src.analytics.results_aggregator",
         "description": "Synthesizing research findings into results/..."
+    },
+    {
+        "name": "Discovery Summary Engine",
+        "module": "src.analytics.discovery_summary_engine",
+        "description": "Generating scientific research snapshot and formal report..."
+    },
+    {
+        "name": "Platform Metrics Engine",
+        "module": "src.metrics.platform_metrics_engine",
+        "description": "Capturing operational metrics and system health snapshot..."
     }
 ]
 
-def run_step(step, step_index):
+def run_step(step, step_index, **kwargs):
     step_name = step["name"]
     module_path = step["module"]
     description = step["description"]
@@ -74,7 +84,12 @@ def run_step(step, step_index):
     
     start_time = time.time()
     try:
-        result = subprocess.run([sys.executable, "-m", module_path], check=True, capture_output=True, text=True)
+        # For modules that might need extra params (like metrics engine)
+        env = os.environ.copy()
+        if "duration" in kwargs:
+            env["PIPELINE_DURATION"] = str(kwargs["duration"])
+            
+        result = subprocess.run([sys.executable, "-m", module_path], check=True, capture_output=True, text=True, env=env)
         duration = time.time() - start_time
         print(f"Success: {step_name} completed in {duration:.2f}s.")
         return {
@@ -132,12 +147,21 @@ def main():
         execution_steps.append(RESEARCH_STEPS[2]) # Benchmark Evaluation
     if args.run_all:
         execution_steps.append(RESEARCH_STEPS[3]) # Results Aggregator
+        
+    # Intelligence & Monitoring (Always run at end or if run-all)
+    execution_steps.append(RESEARCH_STEPS[4]) # Discovery Summary
+    execution_steps.append(RESEARCH_STEPS[5]) # Platform Metrics
 
     execution_details = []
     pipeline_success = True
     
     for i, step in enumerate(execution_steps, 1):
-        detail = run_step(step, i)
+        # We pass duration to the metrics engine step specifically
+        kwargs = {}
+        if step["name"] == "Platform Metrics Engine":
+            kwargs["duration"] = time.time() - start_time
+            
+        detail = run_step(step, i, **kwargs)
         execution_details.append(detail)
         if detail["status"] != "SUCCESS":
             pipeline_success = False
@@ -158,9 +182,6 @@ def main():
     print(f"AUTONOMOUS PIPELINE COMPLETE - STATUS: {status_str} - TIME: {total_duration:.2f}s")
     print(f"Report: {report_file_path}")
     print("="*60 + "\n")
-
-if __name__ == "__main__":
-    main()
 
 if __name__ == "__main__":
     main()

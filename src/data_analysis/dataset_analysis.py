@@ -30,6 +30,7 @@ from scipy import stats
 from src.config.config import config
 from src.utils.logger import setup_logger
 from src.utils.db import get_engine
+from sqlalchemy import text
 
 logger = setup_logger("DatasetAnalysis")
 warnings.filterwarnings("ignore")
@@ -71,6 +72,20 @@ def clean_outliers(df):
     for col in ["planet_radius", "planet_mass", "planet_density", "equilibrium_temperature"]:
         df[col] = df[col].replace(0, np.nan)
         
+    # BOOTSTRAP: If target is missing (common after fresh NASA ingestion), 
+    # we derive a baseline habitability_index based on analytical similarity.
+    if TARGET not in df.columns or df[TARGET].isnull().all():
+        logger.info("Target 'habitability_index' missing or null. Bootstrapping baseline labels...")
+        # Analytical Earth Similarity Approximation for bootstrapping
+        r_diff = ((df["planet_radius"].fillna(5.0) - 1.0) / 1.0) ** 2
+        m_diff = ((df["planet_mass"].fillna(20.0) - 1.0) / 1.0) ** 2
+        t_diff = ((df["equilibrium_temperature"].fillna(500.0) - 288) / 288) ** 2
+        
+        # Calculate habitability score as a similarity metric
+        scores = 1.0 / (1.0 + np.sqrt(r_diff + m_diff + t_diff))
+        df[TARGET] = scores
+        logger.info(f"Bootstrap complete. Target mean: {df[TARGET].mean():.4f}")
+        
     df = df.dropna(subset=[TARGET])
     df = df[(df["stellar_mass"] < 50) | df["stellar_mass"].isnull()]
     df = df[(df["stellar_radius"] < 50) | df["stellar_radius"].isnull()]
@@ -83,9 +98,10 @@ def clean_outliers(df):
     df_clean = df.copy()
     for col in z_cols:
         col_data = df_clean[col].dropna()
-        z_scores = np.abs(stats.zscore(col_data))
-        valid_indices = col_data[z_scores < 3].index
-        df_clean = df_clean[df_clean[col].isnull() | df_clean.index.isin(valid_indices)]
+        if len(col_data) > 1:
+            z_scores = np.abs(stats.zscore(col_data))
+            valid_indices = col_data[z_scores < 3].index
+            df_clean = df_clean[df_clean[col].isnull() | df_clean.index.isin(valid_indices)]
         
     logger.info(f"Z-Score filtering applied: removed {current_len - len(df_clean):,} rows.")
     
@@ -95,9 +111,12 @@ def clean_outliers(df):
     df_major = df_clean[is_major]
     df_minor = df_clean[~is_major]
     
-    sample_size = min(max(int(len(df_major) * 0.1), len(df_minor) * 2), len(df_major))
-    df_balanced = pd.concat([df_major.sample(n=sample_size, random_state=42), df_minor])
-    
+    if not df_major.empty:
+        sample_size = min(max(int(len(df_major) * 0.1), len(df_minor) * 2), len(df_major))
+        df_balanced = pd.concat([df_major.sample(n=sample_size, random_state=42), df_minor])
+    else:
+        df_balanced = df_clean.copy()
+        
     logger.info(f"Data Balanced: final dataset has {len(df_balanced):,} rows.")
     return df_balanced
 
@@ -141,25 +160,51 @@ def generate_visual_reports(df):
     
     # Scatter plot
     plt.figure(figsize=(8, 6))
-    sns.scatterplot(x=df["earth_similarity_approx"], y=df[TARGET], hue=df["stellar_habitability_factor"], palette="viridis")
-    plt.savefig(os.path.join(config.OUTPUT_DIR, "03_earth_similarity_scatter.png"))
+    if not df.empty and TARGET in df.columns:
+        sns.scatterplot(x=df["earth_similarity_approx"], y=df[TARGET], hue=df["stellar_habitability_factor"], palette="viridis")
+        plt.savefig(os.path.join(config.OUTPUT_DIR, "03_earth_similarity_scatter.png"))
     plt.close()
     
     # Correlation Plot
     plt.figure(figsize=(8, 6))
-    sns.heatmap(df[["earth_similarity_approx", "stellar_habitability_factor", "density_ratio", TARGET]].corr(), annot=True, cmap="mako")
+    cols_to_corr = ["earth_similarity_approx", "stellar_habitability_factor", "density_ratio"]
+    if TARGET in df.columns:
+        cols_to_corr.append(TARGET)
+    sns.heatmap(df[cols_to_corr].corr(), annot=True, cmap="mako")
     plt.savefig(os.path.join(config.OUTPUT_DIR, "04_engineered_correlation.png"))
     plt.close()
     
     logger.info(f"Visual reports saved to {config.OUTPUT_DIR}")
 
 
+from sqlalchemy import text
+
 def save_to_database(df):
     logger.info("Writing Enriched Dataset to PostgreSQL ...")
     engine = get_engine()
     try:
+        # Enriched records for dashboard/API
         df.to_sql(name="planets_enriched", schema="exoplanet_data", con=engine, if_exists="replace", index=False)
-        logger.info("Successfully wrote 'exoplanet_data.planets_enriched' to the database.")
+        
+        # Primary discovery table: Use TRUNCATE + APPEND to preserve views
+        with engine.begin() as conn:
+            logger.info("Truncating 'exoplanet_data.planets' to preserve dependent views...")
+            conn.execute(text("TRUNCATE TABLE exoplanet_data.planets CASCADE;"))
+            
+            # Fetch existing columns in the 'planets' table to ensure perfect schema alignment
+            db_cols = pd.read_sql("SELECT * FROM exoplanet_data.planets LIMIT 0", conn).columns.tolist()
+            common_cols = [col for col in df.columns if col in db_cols]
+            
+            logger.info(f"Appending {len(common_cols)} synchronized columns to 'exoplanet_data.planets'...")
+            df[common_cols].to_sql(
+                name="planets", 
+                schema="exoplanet_data", 
+                con=conn, 
+                if_exists="append", 
+                index=False
+            )
+        
+        logger.info("Successfully synchronized 'exoplanet_data.planets_enriched' and 'planets' via TRUNCATE/APPEND.")
     except Exception as e:
         logger.error(f"Error writing to database: {e}")
 
@@ -173,6 +218,7 @@ def main():
     generate_visual_reports(df_enriched)
     save_to_database(df_enriched)
     logger.info("Dataset Intelligence Pipeline Complete.")
+
 
 if __name__ == "__main__":
     main()

@@ -1,33 +1,33 @@
 
     ExoIntel Research Results Summary
     ==================================
-    Timestamp: 2026-03-06T16:56:55.340300
+    Timestamp: 2026-03-06T17:53:05.070800
     
     1. Top Discovery Candidates
     ---------------------------
-           planet_name  ml_habitability_score  combined_discovery_score
-     Kepler-1649 b               0.851322                  0.883080
-Teegarden's Star b               0.851322                  0.852112
-         TOI-700 e               0.851322                  0.845481
-         GJ 1002 b               0.851336                  0.839778
-     Proxima Cen b               0.851336                  0.830801
-      TRAPPIST-1 f               0.851336                  0.830480
-          YZ Cet d               0.851322                  0.829084
-         TOI-700 d               0.851322                  0.826043
-Teegarden's Star c               0.851336                  0.823413
-     Kepler-1649 c               0.851336                  0.823146
+     planet_name  ml_habitability_score  combined_discovery_score
+ Gliese 12 b               0.907873                  0.899895
+TRAPPIST-1 f               0.865156                  0.838772
+TRAPPIST-1 e               0.829432                  0.795081
+TRAPPIST-1 c               0.794299                  0.768666
+ LP 791-18 d               0.772043                  0.751973
+TRAPPIST-1 g               0.791721                  0.747544
+TRAPPIST-1 b               0.739820                  0.702618
+ Kepler-54 c               0.713430                  0.689491
+Kepler-138 e               0.733832                  0.689485
+TRAPPIST-1 d               0.702523                  0.664275
     
     2. Primary Scientific Drivers (SHAP)
     ------------------------------------
                feature_name  mean_abs_shap
-            planet_mass       0.020139
-equilibrium_temperature       0.010263
-          planet_radius       0.000640
-         planet_density       0.000349
-         stellar_radius       0.000051
+            planet_mass       0.080979
+equilibrium_temperature       0.005813
+          planet_radius       0.002917
+         stellar_radius       0.000537
+         planet_density       0.000517
     
     3. Population Analytics
     -----------------------
-    Average Habitability Score: 0.8415850220123077
-    Total Verified Candidates: 4433
+    Average Habitability Score: 0.08283896163088966
+    Total Verified Candidates: 1563
     

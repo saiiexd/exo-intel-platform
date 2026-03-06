@@ -73,20 +73,45 @@ def get_feature_importance():
 
 @app.get("/discovery-summary")
 def get_discovery_summary():
-    """Returns high-level discovery statistics."""
+    """Returns high-level discovery statistics from the latest research snapshot."""
     try:
-        count_query = text("SELECT COUNT(*) FROM exoplanet_data.habitable_planet_candidates")
-        avg_query = text("SELECT AVG(ml_habitability_score) as avg_score FROM exoplanet_data.habitable_planet_candidates")
-        
-        with engine.connect() as conn:
-            total_candidates = conn.execute(count_query).scalar()
-            avg_score = conn.execute(avg_query).scalar()
-            
-        return {
-            "total_candidates_analyzed": int(total_candidates),
-            "average_catalog_habitability": float(avg_score),
-            "platform_status": "Operational"
-        }
+        query = text("SELECT * FROM exoplanet_data.discovery_summary_snapshot")
+        df = pd.read_sql(query, engine)
+        if df.empty:
+            return {"status": "No snapshot available. Run pipeline to generate."}
+        return df.iloc[0].to_dict()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/metrics/pipeline")
+def get_pipeline_metrics(limit: int = 10):
+    """Returns the most recent pipeline execution metrics."""
+    try:
+        query = text(f"SELECT * FROM platform_metrics.pipeline_runs ORDER BY timestamp DESC LIMIT {limit}")
+        df = pd.read_sql(query, engine)
+        return df.to_dict(orient="records")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/metrics/model")
+def get_model_metrics():
+    """Returns the most recent machine learning model performance metrics."""
+    try:
+        query = text("SELECT * FROM platform_metrics.model_performance ORDER BY timestamp DESC LIMIT 1")
+        df = pd.read_sql(query, engine)
+        if df.empty:
+            return {"status": "No model metrics available."}
+        return df.iloc[0].to_dict()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/metrics/discovery")
+def get_discovery_metrics():
+    """Returns historical discovery statistics snapshots."""
+    try:
+        query = text("SELECT * FROM platform_metrics.discovery_statistics ORDER BY timestamp DESC LIMIT 10")
+        df = pd.read_sql(query, engine)
+        return df.to_dict(orient="records")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
