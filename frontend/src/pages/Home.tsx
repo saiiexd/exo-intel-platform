@@ -1,5 +1,8 @@
 import React from 'react';
 import { Rocket, Shield, Target, Zap } from 'lucide-react';
+import Button from '@/components/ui/Button';
+import StatsCard from '@/components/ui/StatsCard';
+import Card from '@/components/ui/Card';
 
 const homeStats = [
     { label: 'Confirmed Planets', value: '5,600+', icon: Target, color: 'text-primary' },
@@ -24,25 +27,21 @@ const Home = () => {
                     ExoIntel utilizes advanced machine learning and astrophysical analytics to identify and rank potentially habitable planets across the cosmos.
                 </p>
                 <div className="flex justify-center gap-4">
-                    <button className="bg-primary hover:bg-primary/80 text-white px-8 py-3 rounded-lg font-bold transition-all">
-                        Launch Explorer
-                    </button>
-                    <button className="glass-panel hover:bg-white/5 border border-white/10 px-8 py-3 rounded-lg font-bold transition-all">
-                        View Methodology
-                    </button>
+                    <Button size="lg">Launch Explorer</Button>
+                    <Button size="lg" variant="outline">View Methodology</Button>
                 </div>
             </section>
 
             {/* Stats Section */}
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {homeStats.map((stat, idx) => (
-                    <div key={idx} className="cosmic-card p-8 space-y-4">
-                        <stat.icon className={`w-8 h-8 ${stat.color}`} />
-                        <div>
-                            <p className="text-sm font-medium text-muted">{stat.label}</p>
-                            <h3 className="text-3xl font-bold">{stat.value}</h3>
-                        </div>
-                    </div>
+                    <StatsCard
+                        key={idx}
+                        label={stat.label}
+                        value={stat.value}
+                        icon={stat.icon}
+                        color={stat.color}
+                    />
                 ))}
             </section>
 
@@ -66,9 +65,9 @@ const Home = () => {
                         ))}
                     </ul>
                 </div>
-                <div className="cosmic-card aspect-video border-dashed border-2 flex items-center justify-center text-muted italic">
+                <Card className="aspect-video border-dashed border-2 flex items-center justify-center text-muted italic" hoverable={false}>
                     [Interactive 3D Visualizer Placeholder]
-                </div>
+                </Card>
             </section>
         </div>
     );

@@ -1,4 +1,5 @@
 import { BarChart3, PieChart, Activity } from 'lucide-react';
+import ChartContainer from '@/components/ui/ChartContainer';
 
 const AIInsights = () => {
     return (
@@ -9,53 +10,33 @@ const AIInsights = () => {
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Global Feature Importance */}
-                <section className="cosmic-card p-6 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h3 className="font-bold flex items-center gap-2 text-sm">
-                            <BarChart3 className="w-4 h-4 text-primary" />
-                            Global Feature Importance (SHAP)
-                        </h3>
-                    </div>
-                    <div className="h-64 flex items-center justify-center text-muted italic border border-white/5 rounded-lg bg-[#030308]">
-                        [Interactive SHAP Bar Chart Placeholder]
-                    </div>
-                    <p className="text-xs text-muted">
-                        Relative impact of planetary parameters on the habitability consensus score across the entire NASA dataset.
-                    </p>
-                </section>
+                <ChartContainer
+                    title="Global Feature Importance (SHAP)"
+                    icon={<BarChart3 className="w-4 h-4 text-primary" />}
+                    description="Relative impact of planetary parameters on the habitability consensus score across the entire NASA dataset."
+                >
+                    [Interactive SHAP Bar Chart Placeholder]
+                </ChartContainer>
 
-                {/* Discovery Methodology Correlation */}
-                <section className="cosmic-card p-6 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h3 className="font-bold flex items-center gap-2 text-sm">
-                            <PieChart className="w-4 h-4 text-secondary" />
-                            Correlation Analysis: Discovery Method
-                        </h3>
-                    </div>
-                    <div className="h-64 flex items-center justify-center text-muted italic border border-white/5 rounded-lg bg-[#030308]">
-                        [Discovery Method vs Habitability Chart Placeholder]
-                    </div>
-                    <p className="text-xs text-muted">
-                        Analyzing whether specific discovery methods (Transit, Radial Velocity) introduce bias in habitability predictions.
-                    </p>
-                </section>
+                <ChartContainer
+                    title="Correlation Analysis: Discovery Method"
+                    icon={<PieChart className="w-4 h-4 text-secondary" />}
+                    description="Analyzing whether specific discovery methods (Transit, Radial Velocity) introduce bias in habitability predictions."
+                >
+                    [Discovery Method vs Habitability Chart Placeholder]
+                </ChartContainer>
 
-                {/* Prediction Confidence Distribution */}
-                <section className="md:col-span-2 cosmic-card p-6 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h3 className="font-bold flex items-center gap-2 text-sm">
-                            <Activity className="w-4 h-4 text-success" />
-                            Model Confidence & Error Distribution
-                        </h3>
-                    </div>
-                    <div className="h-48 flex items-center justify-center text-muted italic border border-white/5 rounded-lg bg-[#030308]">
-                        [Error Metrics / Loss Distribution Chart Placeholder]
-                    </div>
-                    <p className="text-xs text-muted">
-                        Monitoring the statistical variance of the habitability index across planetary clusters.
-                    </p>
-                </section>
+                <div className="md:col-span-2">
+                    <ChartContainer
+                        title="Model Confidence & Error Distribution"
+                        icon={<Activity className="w-4 h-4 text-success" />}
+                        description="Monitoring the statistical variance of the habitability index across planetary clusters."
+                    >
+                        <div className="h-48 flex items-center justify-center">
+                            [Error Metrics / Loss Distribution Chart Placeholder]
+                        </div>
+                    </ChartContainer>
+                </div>
             </div>
         </div>
     );

@@ -1,4 +1,5 @@
 import { Terminal, Database, ShieldCheck, GitBranch } from 'lucide-react';
+import Card from '@/components/ui/Card';
 
 const Research = () => {
     return (
@@ -24,11 +25,11 @@ const Research = () => {
                             { title: 'ML Pipeline', desc: 'Ensemble models trained on astrophysical features.', icon: Terminal },
                             { title: 'Explainable AI', desc: 'SHAP interpretations for model transparency.', icon: ShieldCheck },
                         ].map((item, idx) => (
-                            <div key={idx} className="cosmic-card p-6 space-y-3">
+                            <Card key={idx} className="p-6 space-y-3">
                                 <item.icon className="w-5 h-5 text-primary" />
                                 <h4 className="font-bold text-sm uppercase tracking-wide">{item.title}</h4>
                                 <p className="text-xs text-muted leading-relaxed">{item.desc}</p>
-                            </div>
+                            </Card>
                         ))}
                     </div>
                 </section>
@@ -60,7 +61,7 @@ const Research = () => {
                 </section>
 
                 {/* Documentation Links */}
-                <section className="cosmic-card p-8 bg-primary/5 border-primary/20 space-y-4">
+                <Card className="p-8 bg-primary/5 border-primary/20 space-y-4" hoverable={false}>
                     <h3 className="font-bold text-lg">Ready to Contribute?</h3>
                     <p className="text-sm text-muted">
                         The ExoIntel platform is open-source under the MIT License. Explore the full technical documentation and source code on GitHub.
@@ -69,7 +70,7 @@ const Research = () => {
                         <button className="bg-primary text-white px-6 py-2 rounded-lg text-sm font-bold">GitHub Repo</button>
                         <button className="text-primary text-sm font-bold border-b border-primary/30 hover:border-primary transition-all">Technical Docs</button>
                     </div>
-                </section>
+                </Card>
             </div>
         </div>
     );
