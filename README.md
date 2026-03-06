@@ -101,38 +101,65 @@ docker-compose up --build
 
 Access the dashboard at `http://localhost:8501`.
 
-## Scientific Validation
+## Machine Learning Methodology
 
-### Model Explainability (SHAP)
+The ExoIntel habitability index is derived through a supervised learning process targeting planetary similarity to Earth-like conditions.
+*   **Data Processing**: Multi-stage outlier filtering using Z-score (threshold=3) and physical constraints (e.g., stellar mass < 50 Sun masses).
+*   **Feature Engineering**: Derivation of the Earth Similarity Score (ESS) and Stellar Habitability Factor.
+*   **Model Selection**: Gradient Boosting Regressor optimized via cross-validation for predictive stability and high R² performance.
+*   **Target Scaling**: All scores are normalized to a [0, 1] range for intuitive scientific interpretation.
 
-ExoIntel prioritizes scientific transparency. By utilizing SHAP values, the platform identifies exactly which astrophysical parameters—such as planetary equilibrium temperature or stellar mass—positively or negatively influence the habitability predictions. 
+## Explainable AI Integration
 
-### Data and Model Explanation
+ExoIntel prioritizes scientific transparency. By utilizing SHAP (Shapley Additive Explanations), the platform identifies exactly which astrophysical parameters—such as planetary equilibrium temperature or stellar mass—positively or negatively influence the habitability predictions. This allows researchers to validate model logic against established astronomical principles.
 
-The habitability index is derived through a supervised learning process that incorporates planetary radius, mass, density, and stellar characteristics. The model is trained on curated astronomical datasets with rigorous outlier filtering to ensure robust predictive performance.
+## Scientific Insights
 
-## Synchronization Utility
+The platform automatically surfaces galactic-scale trends:
+*   **Stellar Correlations**: Analysis of how host star temperature correlates with planetary habitability potential.
+*   **Discovery Efficacy**: Statistical evaluation of which astronomical discovery methods are most successful in identifying high-priority candidates.
+*   **Distribution Analysis**: Global mapping of habitability scores across the known exoplanet catalog.
 
-The project includes an automated synchronization script for repository maintenance:
+## Repository Structure
 
+*   `src/data_analysis/`: Data cleansing and feature engineering logic.
+*   `src/ml_models/`: Model training pipelines and SHAP explainability engines.
+*   `src/discovery/`: Candidate prioritization and ranking algorithms.
+*   `src/analytics/`: Scientific insight generators and reporting utilities.
+*   `src/frontend/`: Streamlit interactive dashboard source.
+*   `src/config/`: Centralized environment and platform configuration.
+*   `src/utils/`: Standardized logging, database, and health utilities.
+*   `docs/`: System architecture and technical documentation.
+*   `analysis_outputs/`: Visualizations and statistical reports.
+
+## Installation Instructions
+
+### 1. Prerequisites
+*   Python 3.9+
+*   PostgreSQL 15+
+*   Docker (Optional)
+
+### 2. Configuration
+Create a `.env` file from the template:
 ```bash
-# Sychronize updates with GitHub
-python github_sync.py -m "Feature: Integrated XAI waterfall plots"
-
-# Create a major release tag
-python github_sync.py -t v1.0.0
+cp .env.example .env
 ```
+Configure `DB_USER`, `DB_PASSWORD`, `DB_HOST`, and `DB_NAME`.
 
-## Contribution Guidelines
+## Usage Workflow
 
-ExoIntel welcomes contributions from the scientific and engineering community. To propose changes:
-1. Fork the repository.
-2. Create a feature branch.
-3. Submit a pull request with detailed documentation of changes.
+1.  **Initialize Pipeline**: Run the orchestrator to build the research foundation.
+    ```bash
+    python run_exointel_pipeline.py
+    ```
+2.  **Explore Dashboard**: Launch the research interface.
+    ```bash
+    streamlit run src/frontend/app.py
+    ```
 
-## License
+## Licensing
 
 This project is licensed under the MIT License.
 
 ---
-*ExoIntel AI Exoplanet Discovery Platform*
+*ExoIntel AI Exoplanet Discovery Platform - Initial Stable Release v1.0.0*
