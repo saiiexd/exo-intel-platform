@@ -33,3 +33,10 @@ pipeline_logs/*.txt
 
 # Jupyter Notebooks
 .ipynb_checkpoints/
+
+.env
+venv/
+__pycache__/
+*.pyc
+pipeline_logs/
+analysis_outputs/temp/
