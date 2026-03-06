@@ -33,9 +33,9 @@ def aggregate_results():
     candidates_df = pd.DataFrame()
     try:
         candidates_df = pd.read_sql(
-            "SELECT planet_name, ml_habitability_score, composite_discovery_score "
+            "SELECT planet_name, ml_habitability_score, combined_discovery_score "
             "FROM exoplanet_data.habitable_planet_candidates "
-            "ORDER BY composite_discovery_score DESC LIMIT 50",
+            "ORDER BY combined_discovery_score DESC LIMIT 50",
             engine
         )
         candidates_df.to_csv(os.path.join("results", "top_habitable_candidates.csv"), index=False)
@@ -51,8 +51,8 @@ def aggregate_results():
     importance_df = pd.DataFrame()
     try:
         importance_df = pd.read_sql(
-            "SELECT feature_name, importance_value FROM exoplanet_data.feature_importance_analysis "
-            "ORDER BY importance_value DESC",
+            "SELECT feature_name, mean_abs_shap FROM exoplanet_data.feature_importance_analysis "
+            "ORDER BY mean_abs_shap DESC",
             engine
         )
         importance_df.to_csv(os.path.join("results", "feature_importance_ranking.csv"), index=False)
