@@ -43,6 +43,11 @@ PIPELINE_STEPS = [
 # Optional Research & Benchmark Steps
 RESEARCH_STEPS = [
     {
+        "name": "NASA Data Ingestion",
+        "module": "src.data_ingestion.nasa_exoplanet_fetcher",
+        "description": "Fetching latest confirmed exoplanet data from NASA Archive..."
+    },
+    {
         "name": "Experiment Orchestrator",
         "module": "src.ml_models.experiment_orchestrator",
         "description": "Running multi-algorithm research experiments..."
@@ -92,36 +97,46 @@ def run_step(step, step_index):
         }
 
 def main():
-    parser = argparse.ArgumentParser(description="ExoIntel Research Pipeline Orchestrator")
+    parser = argparse.ArgumentParser(description="ExoIntel Autonomous Research Pipeline Orchestrator")
     parser.add_argument("--run-all", action="store_true", help="Execute all production and research steps.")
+    parser.add_argument("--refresh-data", action="store_true", help="Fetch latest data from NASA Archive API.")
     parser.add_argument("--run-experiments", action="store_true", help="Perform algorithm benchmarking.")
     parser.add_argument("--run-benchmarks", action="store_true", help="Evaluate model against planetary scenarios.")
     args = parser.parse_args()
 
     start_time = time.time()
     timestamp_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    report_file_path = os.path.join(config.LOGS_DIR, f"research_report_{timestamp_str}.txt")
+    report_file_path = os.path.join(config.LOGS_DIR, f"autonomous_report_{timestamp_str}.txt")
     
     print("\n" + "="*60)
-    print(f"ExoIntel Research-Grade Pipeline Orchestrator")
+    print(f"ExoIntel Autonomous Research-Grade Pipeline")
     print("="*60)
     
     if not run_health_check():
         print("\nAborting: System health check failed.")
         sys.exit(1)
         
-    all_steps = PIPELINE_STEPS.copy()
+    execution_steps = []
+    
+    # Optional Data Ingestion (Step 0)
+    if args.run_all or args.refresh_data:
+        execution_steps.append(RESEARCH_STEPS[0])
+        
+    # Core Production Pipeline
+    execution_steps.extend(PIPELINE_STEPS)
+    
+    # Optional Research Extensions
     if args.run_all or args.run_experiments:
-        all_steps.append(RESEARCH_STEPS[0]) # Experiment Orchestrator
+        execution_steps.append(RESEARCH_STEPS[1]) # Experiment Orchestrator
     if args.run_all or args.run_benchmarks:
-        all_steps.append(RESEARCH_STEPS[1]) # Benchmark Evaluation
+        execution_steps.append(RESEARCH_STEPS[2]) # Benchmark Evaluation
     if args.run_all:
-        all_steps.append(RESEARCH_STEPS[2]) # Results Aggregator
+        execution_steps.append(RESEARCH_STEPS[3]) # Results Aggregator
 
     execution_details = []
     pipeline_success = True
     
-    for i, step in enumerate(all_steps, 1):
+    for i, step in enumerate(execution_steps, 1):
         detail = run_step(step, i)
         execution_details.append(detail)
         if detail["status"] != "SUCCESS":
@@ -133,14 +148,14 @@ def main():
     
     # Final Summary Report
     with open(report_file_path, "w", encoding="utf-8") as f:
-        f.write(f"ExoIntel Research Execution Report - {status_str}\n")
+        f.write(f"ExoIntel Autonomous Execution Report - {status_str}\n")
         f.write(f"Timestamp: {datetime.now().isoformat()}\n")
         f.write(f"Total Duration: {total_duration:.2f}s\n\n")
         for d in execution_details:
             f.write(f"Step {d['step']}: {d['name']} [{d['status']}] ({d['duration']:.2f}s)\n")
 
     print("\n" + "="*60)
-    print(f"RESEARCH PIPELINE COMPLETE - STATUS: {status_str} - TIME: {total_duration:.2f}s")
+    print(f"AUTONOMOUS PIPELINE COMPLETE - STATUS: {status_str} - TIME: {total_duration:.2f}s")
     print(f"Report: {report_file_path}")
     print("="*60 + "\n")
 
