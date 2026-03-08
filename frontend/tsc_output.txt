@@ -1,0 +1,2 @@
+src/main.tsx(3,17): error TS5097: An import path can only end with a '.tsx' extension when 'allowImportingTsExtensions' is enabled.
+src/pages/Research.tsx(24,129): error TS2304: Cannot find name 'Target'.

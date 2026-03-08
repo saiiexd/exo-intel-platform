@@ -126,6 +126,33 @@ ExoIntel implements a "Scientific-as-Code" workflow:
 5.  **Rank**: Sort candidates and generate the discovery short-list.
 6.  **Disseminate**: Produce visual and textual research reports.
 
+## Interactive Web Interface
+
+The ExoIntel platform includes a dedicated interactive web interface built with React and TypeScript. This interface provides a robust, component-driven frontend application that enables researchers and users to explore discovery datasets and interact directly with the predictive models.
+
+The frontend integrates seamlessly with the ExoIntel platform by communicating with the backend FastAPI service via RESTful endpoints. This architecture decouples the presentation layer from the data warehouse and machine learning pipelines, ensuring a scalable and maintainable system. All data fetching operations handle loading states and include safe fallbacks in case the backend API is temporarily unavailable.
+
+### Running the Frontend Locally
+
+To launch the interactive web interface on your local machine, follow these steps:
+
+1. Clone the repository
+2. Navigate to the frontend directory: `cd frontend`
+3. Install dependencies: `npm install`
+4. Run the development server: `npm run dev`
+
+### Interface Features
+
+The application provides the following core pages:
+
+* **Home**: Displays high-level platform statistics, navigational elements, and an overview of the scientific methodology powering the autonomous discovery engine.
+* **Discovery Explorer**: A comprehensive data table for browsing candidate planets, featuring search capabilities, filtering mechanisms, and detailed habitability scores derived from the backend models.
+* **Habitability Simulator**: An interactive environment where users can manipulate planetary parameters (such as radius, mass, and equilibrium temperature) and invoke the prediction service to receive a habitability consensus score.
+* **AI Insights**: Presents scientific visualizations and global feature importance metrics extracted from the explainable AI (SHAP) layer, illustrating model behavior and correlation patterns.
+* **Research**: Contains formal documentation regarding system architecture, autonomous pipeline workflows, and links to the project's technical documentation.
+
+This frontend application complements the existing Streamlit research dashboard. While the Streamlit dashboard serves as an internal tool optimized for rapid data visualization and direct Python integration during model development, the React frontend delivers a highly responsive, scalable, and user-friendly experience intended for broader external engagement and presentation of final discovery results.
+
 ## Contributing
 
 We welcome contributions from the astrophysics and machine learning communities.

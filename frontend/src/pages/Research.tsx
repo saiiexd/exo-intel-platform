@@ -1,4 +1,4 @@
-import { Terminal, Database, ShieldCheck, GitBranch } from 'lucide-react';
+import { Terminal, Database, ShieldCheck, GitBranch, Target } from 'lucide-react';
 import Card from '@/components/ui/Card';
 
 const Research = () => {
