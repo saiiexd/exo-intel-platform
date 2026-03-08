@@ -52,9 +52,7 @@ const Navbar = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <button className="bg-primary hover:bg-primary/80 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-primary/20">
-                        Login
-                    </button>
+                    {/* Login removed per user request */}
                 </div>
             </div>
         </nav>

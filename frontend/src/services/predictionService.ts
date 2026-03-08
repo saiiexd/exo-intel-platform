@@ -4,13 +4,10 @@ import { HabitabilityPrediction } from '../types/planetTypes';
 export const predictionService = {
     predictHabitability: async (params: any): Promise<HabitabilityPrediction | null> => {
         try {
-            // Note: Currently no prediction endpoint in main.py, providing mock behavior
-            console.log('Simulating habitability prediction:', params);
-            return {
-                score: 0.85,
-                confidence: 0.92
-            } as any;
+            const response = await apiClient.post('/predict', params);
+            return response.data;
         } catch (error) {
+            console.error('API Error during habitability prediction:', error);
             return null;
         }
     },
