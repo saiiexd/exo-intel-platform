@@ -1,8 +1,15 @@
-import { Search, Filter, ChevronRight, Globe } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Filter, ChevronRight, Globe, Info } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import { useExoplanets } from '../hooks/useExoplanets';
 
 const DiscoveryExplorer = () => {
+    const { planets, loading } = useExoplanets();
+    const [selectedPlanetName, setSelectedPlanetName] = useState<string | null>(null);
+
+    const selectedPlanet = planets.find(p => (p.name || (p as any).planet_name) === selectedPlanetName);
+
     return (
         <div className="space-y-8">
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -43,49 +50,98 @@ const DiscoveryExplorer = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
-                                    {[
-                                        { name: 'K2-18 b', score: 0.89, dist: 38, status: 'Confirmed' },
-                                        { name: 'Gliese 12 b', score: 0.94, dist: 12, status: 'Candidate' },
-                                        { name: 'Proxima Cen b', score: 0.91, dist: 1.3, status: 'Confirmed' },
-                                        { name: 'TRAPPIST-1 e', score: 0.88, dist: 12.1, status: 'Confirmed' },
-                                        { name: 'Kepler-186 f', score: 0.82, dist: 178, status: 'Confirmed' },
-                                    ].map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-white/[0.02] cursor-pointer group transition-colors">
-                                            <td className="px-6 py-4 font-medium flex items-center gap-3">
-                                                <div className="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                                                {item.name}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="font-mono text-primary">{(item.score * 100).toFixed(1)}%</span>
-                                            </td>
-                                            <td className="px-6 py-4 text-muted">{item.dist}</td>
-                                            <td className="px-6 py-4">
-                                                <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight">
-                                                    {item.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <ChevronRight className="w-4 h-4 text-muted group-hover:text-white transition-colors ml-auto" />
-                                            </td>
+                                    {loading ? (
+                                        <tr>
+                                            <td colSpan={5} className="text-center py-8 text-muted">Loading candidates...</td>
                                         </tr>
-                                    ))}
+                                    ) : planets.map((item: any, idx) => {
+                                        const name = item.name || item.planet_name || 'Unknown';
+                                        const score = item.score ?? item.combined_discovery_score ?? 0;
+                                        const dist = item.dist ?? item.distance_pc ?? 'N/A';
+                                        const status = item.status ?? 'Target';
+
+                                        return (
+                                            <tr
+                                                key={idx}
+                                                onClick={() => setSelectedPlanetName(name)}
+                                                className="hover:bg-white/[0.02] cursor-pointer group transition-colors"
+                                            >
+                                                <td className="px-6 py-4 font-medium flex items-center gap-3">
+                                                    <div className="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                                                    {name}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="font-mono text-primary">{(score * 100).toFixed(1)}%</span>
+                                                </td>
+                                                <td className="px-6 py-4 text-muted">{dist}</td>
+                                                <td className="px-6 py-4">
+                                                    <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight">
+                                                        {status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <ChevronRight className="w-4 h-4 text-muted group-hover:text-white transition-colors ml-auto" />
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
                                 </tbody>
                             </table>
                         </div>
                     </Card>
                 </section>
 
-                {/* Detail Sidebar Selection Placeholder */}
+                {/* Detail Sidebar Selection */}
                 <aside>
-                    <Card className="p-6 flex flex-col items-center justify-center text-center space-y-4 h-full">
-                        <div className="bg-surface p-6 rounded-full border border-white/5">
-                            <Globe className="w-12 h-12 text-primary animate-pulse" />
-                        </div>
-                        <div className="space-y-1">
-                            <h3 className="font-bold">Select a Candidate</h3>
-                            <p className="text-sm text-muted">Click on a planet in the discovery list to view detailed habitability analysis and SHAP explanations.</p>
-                        </div>
-                    </Card>
+                    {!selectedPlanet ? (
+                        <Card className="p-6 flex flex-col items-center justify-center text-center space-y-4 h-full">
+                            <div className="bg-surface p-6 rounded-full border border-white/5">
+                                <Globe className="w-12 h-12 text-primary animate-pulse" />
+                            </div>
+                            <div className="space-y-1">
+                                <h3 className="font-bold">Select a Candidate</h3>
+                                <p className="text-sm text-muted">Click on a planet in the discovery list to view detailed habitability analysis and SHAP explanations.</p>
+                            </div>
+                        </Card>
+                    ) : (
+                        <Card className="p-6 space-y-6 h-full flex flex-col">
+                            <div className="space-y-2 border-b border-white/10 pb-4">
+                                <div className="flex items-center gap-2">
+                                    <Globe className="w-5 h-5 text-primary" />
+                                    <h3 className="font-bold text-xl">{selectedPlanetName}</h3>
+                                </div>
+                                <div className="flex gap-2 text-xs">
+                                    <span className="px-2 py-1 rounded bg-success/20 text-success uppercase font-bold tracking-wider">
+                                        Habitability: {(((selectedPlanet as any).score ?? (selectedPlanet as any).combined_discovery_score ?? 0) * 100).toFixed(1)}%
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 flex-grow">
+                                <div className="space-y-1">
+                                    <p className="text-xs text-muted uppercase">Distance</p>
+                                    <p className="font-mono text-sm">{(selectedPlanet as any).dist ?? (selectedPlanet as any).distance_pc ?? 'N/A'} pc</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-xs text-muted uppercase">Radius (Earth)</p>
+                                    <p className="font-mono text-sm">{(selectedPlanet as any).planet_radius_earth ?? 'Unknown'}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-xs text-muted uppercase">Eq. Temp</p>
+                                    <p className="font-mono text-sm">{(selectedPlanet as any).equilibrium_temp_k ?? 'Unknown'} K</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-xs text-muted uppercase">Stellar Type</p>
+                                    <p className="font-mono text-sm">{(selectedPlanet as any).stellar_type ?? 'Unknown'}</p>
+                                </div>
+                            </div>
+
+                            <div className="mt-auto pt-4 border-t border-white/10 text-xs text-muted flex gap-2">
+                                <Info className="w-4 h-4 shrink-0" />
+                                <p>Further SHAP feature importance analysis is available in the AI Insights view or by querying the API directly.</p>
+                            </div>
+                        </Card>
+                    )}
                 </aside>
             </div>
         </div>
@@ -93,3 +149,4 @@ const DiscoveryExplorer = () => {
 };
 
 export default DiscoveryExplorer;
+

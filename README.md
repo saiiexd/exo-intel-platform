@@ -35,27 +35,21 @@ ExoIntel is built on a modular, layered architecture designed for scalability an
 6.  **Presentation Layer**: Streamlit dashboard for interactive exploration and a Research API for external integration.
 7.  **Orchestration Layer**: A central management script that coordinates the full discovery workflow with health checks and logging.
 
-## Repository Structure
+## Project Structure
+
+The ExoIntel repository is organized into distinct directories to support both scientific development and open-source collaboration:
 
 ```text
-├── src/                        # Core system modules
-│   ├── analytics/              # Insight engines and report generators
-│   ├── api/                    # Research API service (FastAPI)
-│   ├── config/                 # System and database configuration
-│   ├── data_analysis/          # Dataset enrichment and preprocessing
-│   ├── data_ingestion/         # NASA API fetchers and loaders
-│   ├── discovery/              # Habitability ranking and discovery logic
-│   ├── frontend/               # Interactive Streamlit dashboard
-│   ├── metrics/                # Platform monitoring and system health
-│   ├── ml_models/              # Model training, experiments, and XAI (SHAP)
-│   └── utils/                  # Shared loggers and health checks
-├── docs/                       # Architecture diagrams and research material
-├── experiments/                # Model evaluation and benchmarking logs
-├── benchmarks/                 # Planetary scenario testing suites
-├── reports/                    # Generated research papers and summaries
+├── src/                        # Core AI discovery pipeline and backend services (FastAPI/Streamlit)
+├── frontend/                   # Interactive web interface (React/Vite)
+├── docs/                       # Technical architecture diagrams and internal documentation
+├── analysis_outputs/           # High-resolution generated plots (SHAP values, global feature importance)
+├── research/                   # Public scientific documentation (methodology, datasets, ML summaries)
+├── community/                  # Open-source contribution guides, local setup, and project roadmap
 ├── datasets/                   # Reference datasets and transformations
-├── analysis_outputs/           # Visualizations (SHAP, trends, rankings)
-└── run_exointel_pipeline.py    # Main pipeline orchestrator
+├── experiments/                # Model evaluation and benchmarking logs
+├── reports/                    # Generated research papers and summaries
+└── run_exointel_pipeline.py    # Main pipeline orchestrator executed to rebuild the entire system
 ```
 
 ## Installation and Setup
