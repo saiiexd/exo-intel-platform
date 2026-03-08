@@ -27,3 +27,13 @@ analysis_outputs/temp/
 
 # Jupyter Notebooks
 .ipynb_checkpoints/
+
+# Node.js
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Frontend specific
+frontend/dist/
+frontend/node_modules/

@@ -1,2 +1,0 @@
-node_modules/vite/dist/node/index.d.ts(867,22): error TS2420: Class 'import("E:/exo-intel-platform/frontend/node_modules/vite/dist/node/index").FSWatcher' incorrectly implements interface 'import("node:fs").FSWatcher'.
-  Type 'FSWatcher' is missing the following properties from type 'FSWatcher': ref, unref

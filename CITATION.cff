@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite it using the following metadata."
+title: "ExoIntel AI Exoplanet Discovery Platform"
+abstract: "A comprehensive machine learning platform designed to streamline exoplanet habitability research through automated data ingestion, gradient boosting models, explainable AI (SHAP), and collaborative visualization tools."
+authors:
+  - family-names: "Developer"
+    given-names: "ExoIntel"
+version: "2.0.0"
+date-released: "2026-03-08"
+repository-code: "https://github.com/ExoIntel/exo-intel-platform"
+license: "MIT"
+keywords:
+  - "exoplanets"
+  - "machine-learning"
+  - "habitability"
+  - "astrophysics"
+  - "shap"
+  - "explainable-ai"
