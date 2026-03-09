@@ -188,6 +188,8 @@ Ensure that new features include appropriate tests and documentation.
 
 The ExoIntel repository now includes a full technical documentation system located in the `docs/` directory. This documentation covers the platform's architecture, data ingestion pipelines, machine learning workflows, the discovery ranking engine, explainable AI integrations, interactive interfaces, local installation guides, and detailed reproducibility information. It serves as the primary technical resource for both researchers and contributing engineers.
 
+A full technical report consolidating these documents is available in [docs/ExoIntel_Technical_Documentation.pdf](docs/ExoIntel_Technical_Documentation.pdf).
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
