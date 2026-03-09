@@ -190,6 +190,10 @@ The ExoIntel repository now includes a full technical documentation system locat
 
 A full technical report consolidating these documents is available in [docs/ExoIntel_Technical_Documentation.pdf](docs/ExoIntel_Technical_Documentation.pdf).
 
+## Project Website
+
+A comprehensive static project website is available in the `website/` directory. Once GitHub Pages is enabled for this repository (serving from the `website/` folder), the site can be accessed online to explore the platform architecture, key discovery insights, and documentation links.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

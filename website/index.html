@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExoIntel — AI Exoplanet Discovery Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="hero">
+        <div class="container">
+            <h1 class="hero-title">ExoIntel</h1>
+            <p class="hero-subtitle">AI Exoplanet Discovery Platform</p>
+            <p class="hero-description">An autonomous computational framework analyzing planetary habitability through advanced machine learning, rigorous astrophysical feature engineering, and Explainable AI.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- Overview Section -->
+        <section id="overview" class="section">
+            <h2 class="section-title">Platform Overview</h2>
+            <div class="card">
+                <p>The <strong>ExoIntel</strong> platform bridges the gap between raw astronomy and actionable astrobiology. The platform automatically ingests raw observational data from the NASA Exoplanet Archive, applies rigorous feature engineering to derive critical planetary and stellar parameters, and utilizes ensemble machine learning models to predict habitability probabilties.</p>
+                <p>The system goes beyond simple black-box predictions by ranking candidate planets with a specialized discovery engine, validating the results with SHAP (SHapley Additive exPlanations) explainable AI, and generating scientific insights ready for research publication.</p>
+            </div>
+        </section>
+
+        <!-- System Architecture Section -->
+        <section id="architecture" class="section">
+            <h2 class="section-title">System Architecture</h2>
+            <p>The platform follows a linear, reproducible, automated data pipeline ensuring integrity from raw data to final discovery insights.</p>
+            
+            <div class="pipeline-flow">
+                <div class="pipeline-step">
+                    <div class="step-icon">📡</div>
+                    <h3>NASA Data Ingestion</h3>
+                    <p>Retrieving raw planetary & stellar telemetry.</p>
+                </div>
+                <div class="pipeline-arrow">➔</div>
+                <div class="pipeline-step">
+                    <div class="step-icon">🗄️</div>
+                    <h3>PostgreSQL Data Warehouse</h3>
+                    <p>Relational storage and schema validation.</p>
+                </div>
+                <div class="pipeline-arrow">➔</div>
+                <div class="pipeline-step">
+                    <div class="step-icon">⚙️</div>
+                    <h3>Feature Engineering</h3>
+                    <p>Imputation and calculation of key astrophysical metrics.</p>
+                </div>
+                <div class="pipeline-arrow">➔</div>
+                <div class="pipeline-step">
+                    <div class="step-icon">🧠</div>
+                    <h3>Machine Learning Models</h3>
+                    <p>Gradient Boosting / Random Forest habitability prediction.</p>
+                </div>
+                <div class="pipeline-arrow">➔</div>
+                <div class="pipeline-step">
+                    <div class="step-icon">🥇</div>
+                    <h3>Discovery Ranking Engine</h3>
+                    <p>Scoring integration with Earth Similarity Index.</p>
+                </div>
+                <div class="pipeline-arrow">➔</div>
+                <div class="pipeline-step">
+                    <div class="step-icon">🔍</div>
+                    <h3>Explainable AI (SHAP)</h3>
+                    <p>Feature importance mapping to ensure transparency.</p>
+                </div>
+                <div class="pipeline-arrow">➔</div>
+                <div class="pipeline-step">
+                    <div class="step-icon">💻</div>
+                    <h3>User Interfaces</h3>
+                    <p>Streamlit dashboard and interactive React frontend.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Discovery Results Section -->
+        <section id="results" class="section">
+            <h2 class="section-title">Discovery Results</h2>
+            <p>The insight generation layer actively parses predictive output to automatically document macro-trends and model explanations.</p>
+            <div class="gallery">
+                <div class="gallery-item">
+                    <img src="assets/top_candidates.png" alt="Top 20 Habitability Candidates">
+                    <p class="caption">Top Candidate Rankings</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="assets/feature_importance.png" alt="SHAP Global Feature Importance">
+                    <p class="caption">Global Model Feature Importance</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="assets/score_distribution.png" alt="Habitability Score Distribution">
+                    <p class="caption">Habitability Prediction Distribution</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Platform Interfaces Section -->
+        <section id="interfaces" class="section">
+            <h2 class="section-title">Platform Interfaces</h2>
+            <div class="grid-2">
+                <div class="card interface-card">
+                    <h3>📈 Streamlit Research Dashboard</h3>
+                    <p>Built for data scientists and researchers, this interface provides rapid macro-analysis. It connects directly to the PostgreSQL backend to query planetary subsets, visualize generated statistical insights, and act as a testing ground for models before public presentation.</p>
+                </div>
+                <div class="card interface-card">
+                    <h3>🌐 React Interactive Exploration</h3>
+                    <p>A polished, high-performance web interface designed for direct exploration of discovery candidates. It provides detailed, searchable tables and renders interactive SHAP waterfall graphs to help users comprehend exactly why an exoplanet was ranked as habitable.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documentation Section -->
+        <section id="documentation" class="section">
+            <h2 class="section-title">Documentation & Resources</h2>
+            <p>The ExoIntel platform is entirely open-source and dedicated to scientific reproducibility. Review the following resources for technical details.</p>
+            <ul class="resource-list">
+                <li><a href="https://github.com/saiiexd/exo-intel-platform" target="_blank" rel="noopener noreferrer">📂 GitHub Repository</a></li>
+                <li><a href="../docs/ExoIntel_Technical_Documentation.pdf" target="_blank">📄 Technical Documentation (PDF)</a></li>
+                <li><a href="../docs/" target="_blank">📖 Detailed Documentation Directory</a></li>
+                <li><a href="../research_paper.md" target="_blank">📝 Original Research Manuscript</a></li>
+            </ul>
+        </section>
+
+        <!-- Usage Section -->
+        <section id="usage" class="section">
+            <h2 class="section-title">Running the Platform Locally</h2>
+            <div class="card">
+                <p>To run the completely automated science pipeline (ingestion, processing, prediction, explainability, and insight generation) ensuring full reproducibility, clone the repository and execute:</p>
+                <div class="code-block">
+                    <code>python run_exointel_pipeline.py</code>
+                </div>
+                <p>This command rebuilds the entire backend. Instructions for hosting the frontend servers are available in the repository's documentation.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 ExoIntel Research Platform. Released under the MIT License.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
